@@ -25,22 +25,61 @@ import { LegalPageViewer } from './pages/LegalPageViewer';
 import { AdminLogin } from './pages/admin/AdminLogin';
 import { AdminLayout } from './pages/admin/AdminLayout';
 
+function getNormalizedPath(): string {
+  // 1. Check hash routing first (e.g. #/products, #/about)
+  if (window.location.hash) {
+    const hash = window.location.hash.replace(/^#/, '');
+    if (hash.startsWith('/')) return hash;
+  }
+
+  let path = window.location.pathname || '/';
+
+  // 2. If running under a GitHub Pages repository subpath like /clintdemos/ or /clintdemos
+  const knownTopRoutes = [
+    '/admin', '/about', '/products', '/gallery', '/bulk-orders',
+    '/artisans', '/our-artisans', '/government-institutional',
+    '/training-livelihood', '/international-buyers', '/contact', '/legal'
+  ];
+
+  const match = path.match(/^\/[^/]+/);
+  if (match) {
+    const firstSegment = match[0];
+    const isKnown = knownTopRoutes.some(r => r === firstSegment || firstSegment.startsWith(r));
+    if (!isKnown && firstSegment !== '/') {
+      path = path.slice(firstSegment.length) || '/';
+    }
+  }
+
+  return path || '/';
+}
+
 function MainAppContent() {
   const { isAdmin, isAdminLoggedIn } = useApp();
   const isAuthorizedAdmin = !!(isAdmin || isAdminLoggedIn);
-  const [route, setRoute] = useState(() => window.location.pathname || '/');
+  const [route, setRoute] = useState<string>(() => getNormalizedPath());
 
   useEffect(() => {
-    const handlePopState = () => {
-      setRoute(window.location.pathname || '/');
+    const handleLocationChange = () => {
+      setRoute(getNormalizedPath());
     };
-    window.addEventListener('popstate', handlePopState);
-    return () => window.removeEventListener('popstate', handlePopState);
+    window.addEventListener('popstate', handleLocationChange);
+    window.addEventListener('hashchange', handleLocationChange);
+    return () => {
+      window.removeEventListener('popstate', handleLocationChange);
+      window.removeEventListener('hashchange', handleLocationChange);
+    };
   }, []);
 
   const navigate = (to: string) => {
-    window.history.pushState({}, '', to);
-    setRoute(to);
+    // If on GitHub Pages (github.io domain or /clintdemos subpath)
+    const isGitHubPages = window.location.hostname.endsWith('github.io') || window.location.pathname.startsWith('/clintdemos');
+    if (isGitHubPages) {
+      window.location.hash = to;
+      setRoute(to);
+    } else {
+      window.history.pushState({}, '', to);
+      setRoute(to);
+    }
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 

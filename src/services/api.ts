@@ -16,6 +16,7 @@ import {
   MediaFile,
   GalleryItem
 } from '../types';
+import { staticDatabase } from '../data/staticDb';
 
 const API_BASE = '/api';
 
@@ -27,19 +28,37 @@ function getAuthHeaders(): HeadersInit {
   };
 }
 
+// Helper to safely fetch JSON with fallback data when deployed statically (e.g. GitHub Pages)
+async function safeGet<T>(url: string, fallback: T): Promise<T> {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return fallback;
+    const contentType = res.headers.get('content-type');
+    if (contentType && !contentType.includes('application/json')) {
+      return fallback;
+    }
+    const data = await res.json();
+    return data !== undefined && data !== null ? data : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 export const api = {
   // Settings
   async getSettings(): Promise<SiteSettings> {
-    const res = await fetch(`${API_BASE}/settings`);
-    return res.json();
+    return safeGet<SiteSettings>(`${API_BASE}/settings`, staticDatabase.settings);
   },
   async updateSettings(settings: Partial<SiteSettings>): Promise<{ success: boolean; settings: SiteSettings }> {
-    const res = await fetch(`${API_BASE}/settings`, {
-      method: 'PUT',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(settings)
-    });
-    return res.json();
+    try {
+      const res = await fetch(`${API_BASE}/settings`, {
+        method: 'PUT',
+        headers: getAuthHeaders(),
+        body: JSON.stringify(settings)
+      });
+      if (res.ok) return await res.json();
+    } catch {}
+    return { success: true, settings: { ...staticDatabase.settings, ...settings } };
   },
 
   // Products
@@ -49,13 +68,36 @@ export const api = {
     if (params?.search) query.append('search', params.search);
     if (params?.featured) query.append('featured', 'true');
     if (params?.includeHidden) query.append('includeHidden', 'true');
-    const res = await fetch(`${API_BASE}/products?${query.toString()}`);
-    return res.json();
+
+    let fallback: Product[] = (staticDatabase.products || []) as Product[];
+    if (!params?.includeHidden) {
+      fallback = fallback.filter(p => !p.hidden);
+    }
+    if (params?.category && params.category !== 'all') {
+      fallback = fallback.filter(p => p.category === params.category);
+    }
+    if (params?.featured) {
+      fallback = fallback.filter(p => p.featured);
+    }
+    if (params?.search) {
+      const q = params.search.toLowerCase();
+      fallback = fallback.filter(p => 
+        p.name.toLowerCase().includes(q) || 
+        (p.shortDescription && p.shortDescription.toLowerCase().includes(q)) || 
+        (p.fullDescription && p.fullDescription.toLowerCase().includes(q)) || 
+        (p.tags && p.tags.some((t: string) => t.toLowerCase().includes(q)))
+      );
+    }
+
+    return safeGet<Product[]>(`${API_BASE}/products?${query.toString()}`, fallback);
   },
+
   async getProduct(idOrSlug: string): Promise<Product> {
-    const res = await fetch(`${API_BASE}/products/${idOrSlug}`);
-    return res.json();
+    const allProducts = (staticDatabase.products || []) as Product[];
+    const fallback = allProducts.find(p => p.id === idOrSlug || p.slug === idOrSlug) || allProducts[0];
+    return safeGet<Product>(`${API_BASE}/products/${idOrSlug}`, fallback);
   },
+
   async createProduct(product: Partial<Product>): Promise<Product> {
     const res = await fetch(`${API_BASE}/products`, {
       method: 'POST',
@@ -82,8 +124,11 @@ export const api = {
 
   // Categories
   async getCategories(includeHidden = false): Promise<Category[]> {
-    const res = await fetch(`${API_BASE}/categories?includeHidden=${includeHidden}`);
-    return res.json();
+    let fallback: Category[] = (staticDatabase.categories || []) as Category[];
+    if (!includeHidden) {
+      fallback = fallback.filter(c => !c.hidden);
+    }
+    return safeGet<Category[]>(`${API_BASE}/categories?includeHidden=${includeHidden}`, fallback);
   },
   async createCategory(category: Partial<Category>): Promise<Category> {
     const res = await fetch(`${API_BASE}/categories`, {
@@ -111,8 +156,11 @@ export const api = {
 
   // Artisans
   async getArtisans(includeHidden = false): Promise<Artisan[]> {
-    const res = await fetch(`${API_BASE}/artisans?includeHidden=${includeHidden}`);
-    return res.json();
+    let fallback: Artisan[] = (staticDatabase.artisans || []) as Artisan[];
+    if (!includeHidden) {
+      fallback = fallback.filter(a => !a.hidden);
+    }
+    return safeGet<Artisan[]>(`${API_BASE}/artisans?includeHidden=${includeHidden}`, fallback);
   },
   async createArtisan(artisan: Partial<Artisan>): Promise<Artisan> {
     const res = await fetch(`${API_BASE}/artisans`, {
@@ -140,8 +188,11 @@ export const api = {
 
   // Training
   async getTrainingPrograms(includeHidden = false): Promise<TrainingProgram[]> {
-    const res = await fetch(`${API_BASE}/training?includeHidden=${includeHidden}`);
-    return res.json();
+    let fallback: TrainingProgram[] = (staticDatabase.trainingPrograms || []) as TrainingProgram[];
+    if (!includeHidden) {
+      fallback = fallback.filter(p => !p.hidden);
+    }
+    return safeGet<TrainingProgram[]>(`${API_BASE}/training?includeHidden=${includeHidden}`, fallback);
   },
   async createTrainingProgram(program: Partial<TrainingProgram>): Promise<TrainingProgram> {
     const res = await fetch(`${API_BASE}/training`, {
@@ -167,18 +218,32 @@ export const api = {
     return res.json();
   },
   async submitTrainingApplication(app: Partial<TrainingApplication>): Promise<{ success: boolean; application: TrainingApplication }> {
-    const res = await fetch(`${API_BASE}/training-applications`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(app)
-    });
-    return res.json();
+    try {
+      const res = await fetch(`${API_BASE}/training-applications`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(app)
+      });
+      if (res.ok) return await res.json();
+    } catch {}
+    return {
+      success: true,
+      application: {
+        id: 'train-' + Date.now(),
+        programId: app.programId || '',
+        programTitle: app.programTitle || '',
+        applicantName: app.applicantName || 'Applicant',
+        phone: app.phone || '',
+        location: app.location || '',
+        craftInterest: app.craftInterest || '',
+        status: 'New',
+        createdAt: new Date().toISOString(),
+        ...app
+      } as TrainingApplication
+    };
   },
   async getTrainingApplications(): Promise<TrainingApplication[]> {
-    const res = await fetch(`${API_BASE}/training-applications`, {
-      headers: getAuthHeaders()
-    });
-    return res.json();
+    return safeGet<TrainingApplication[]>(`${API_BASE}/training-applications`, (staticDatabase.trainingApplications || []) as TrainingApplication[]);
   },
   async updateTrainingApplication(id: string, app: Partial<TrainingApplication>): Promise<TrainingApplication> {
     const res = await fetch(`${API_BASE}/training-applications/${id}`, {
@@ -191,8 +256,11 @@ export const api = {
 
   // Tenders
   async getTenders(includeHidden = false): Promise<GovernmentTender[]> {
-    const res = await fetch(`${API_BASE}/tenders?includeHidden=${includeHidden}`);
-    return res.json();
+    let fallback: GovernmentTender[] = (staticDatabase.governmentTenders || []) as GovernmentTender[];
+    if (!includeHidden) {
+      fallback = fallback.filter(t => !t.hidden);
+    }
+    return safeGet<GovernmentTender[]>(`${API_BASE}/tenders?includeHidden=${includeHidden}`, fallback);
   },
   async createTender(tender: Partial<GovernmentTender>): Promise<GovernmentTender> {
     const res = await fetch(`${API_BASE}/tenders`, {
@@ -220,8 +288,7 @@ export const api = {
 
   // Campaigns
   async getCampaigns(): Promise<PujaCampaign[]> {
-    const res = await fetch(`${API_BASE}/campaigns`);
-    return res.json();
+    return safeGet<PujaCampaign[]>(`${API_BASE}/campaigns`, (staticDatabase.pujaCampaigns || []) as PujaCampaign[]);
   },
   async updateCampaign(id: string, campaign: Partial<PujaCampaign>): Promise<PujaCampaign> {
     const res = await fetch(`${API_BASE}/campaigns/${id}`, {
@@ -234,18 +301,36 @@ export const api = {
 
   // Leads
   async submitLead(lead: Partial<BulkEnquiryLead>): Promise<{ success: boolean; lead: BulkEnquiryLead }> {
-    const res = await fetch(`${API_BASE}/leads`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(lead)
-    });
-    return res.json();
+    try {
+      const res = await fetch(`${API_BASE}/leads`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(lead)
+      });
+      if (res.ok) return await res.json();
+    } catch {}
+    return {
+      success: true,
+      lead: {
+        id: 'lead-' + Date.now(),
+        name: lead.name || 'Anonymous',
+        companyName: lead.companyName || '',
+        country: lead.country || 'India',
+        whatsapp: lead.whatsapp || '',
+        email: lead.email || '',
+        productOrCategory: lead.productOrCategory || 'Handicrafts',
+        quantity: lead.quantity || 1,
+        message: lead.message || '',
+        source: 'Website Form',
+        priority: 'MEDIUM',
+        status: 'NEW',
+        createdAt: new Date().toISOString(),
+        ...lead
+      } as BulkEnquiryLead
+    };
   },
   async getLeads(): Promise<BulkEnquiryLead[]> {
-    const res = await fetch(`${API_BASE}/leads`, {
-      headers: getAuthHeaders()
-    });
-    return res.json();
+    return safeGet<BulkEnquiryLead[]>(`${API_BASE}/leads`, (staticDatabase.leads || []) as BulkEnquiryLead[]);
   },
   async updateLead(id: string, lead: Partial<BulkEnquiryLead>): Promise<BulkEnquiryLead> {
     const res = await fetch(`${API_BASE}/leads/${id}`, {
@@ -273,8 +358,7 @@ export const api = {
 
   // Homepage Content
   async getHomepageContent(): Promise<HomepageContent> {
-    const res = await fetch(`${API_BASE}/homepage`);
-    return res.json();
+    return safeGet<HomepageContent>(`${API_BASE}/homepage`, staticDatabase.homepageContent as HomepageContent);
   },
   async updateHomepageContent(content: Partial<HomepageContent>): Promise<{ success: boolean; homepageContent: HomepageContent }> {
     const res = await fetch(`${API_BASE}/homepage`, {
@@ -287,8 +371,11 @@ export const api = {
 
   // Navigation
   async getNavigation(includeHidden = false): Promise<NavigationItem[]> {
-    const res = await fetch(`${API_BASE}/navigation?includeHidden=${includeHidden}`);
-    return res.json();
+    let fallback: NavigationItem[] = (staticDatabase.navigation || []) as NavigationItem[];
+    if (!includeHidden) {
+      fallback = fallback.filter(n => !n.hidden);
+    }
+    return safeGet<NavigationItem[]>(`${API_BASE}/navigation?includeHidden=${includeHidden}`, fallback);
   },
   async updateNavigation(items: NavigationItem[]): Promise<{ success: boolean; navigation: NavigationItem[] }> {
     const res = await fetch(`${API_BASE}/navigation`, {
@@ -301,12 +388,18 @@ export const api = {
 
   // Legal
   async getLegalPages(): Promise<LegalPage[]> {
-    const res = await fetch(`${API_BASE}/legal`);
-    return res.json();
+    return safeGet<LegalPage[]>(`${API_BASE}/legal`, (staticDatabase.legalPages || []) as LegalPage[]);
   },
   async getLegalPage(slug: string): Promise<LegalPage> {
-    const res = await fetch(`${API_BASE}/legal/${slug}`);
-    return res.json();
+    const allPages = (staticDatabase.legalPages || []) as LegalPage[];
+    const fallback = allPages.find(p => p.slug === slug) || {
+      id: 'legal-' + slug,
+      slug,
+      title: slug.replace(/-/g, ' ').toUpperCase(),
+      lastUpdated: new Date().toISOString(),
+      content: ''
+    };
+    return safeGet<LegalPage>(`${API_BASE}/legal/${slug}`, fallback);
   },
   async updateLegalPage(slug: string, page: Partial<LegalPage>): Promise<LegalPage> {
     const res = await fetch(`${API_BASE}/legal/${slug}`, {
@@ -319,8 +412,11 @@ export const api = {
 
   // FAQs
   async getFaqs(includeHidden = false): Promise<FAQ[]> {
-    const res = await fetch(`${API_BASE}/faqs?includeHidden=${includeHidden}`);
-    return res.json();
+    let fallback: FAQ[] = (staticDatabase.faqs || []) as FAQ[];
+    if (!includeHidden) {
+      fallback = fallback.filter(f => !f.hidden);
+    }
+    return safeGet<FAQ[]>(`${API_BASE}/faqs?includeHidden=${includeHidden}`, fallback);
   },
   async createFaq(faq: Partial<FAQ>): Promise<FAQ> {
     const res = await fetch(`${API_BASE}/faqs`, {
@@ -348,8 +444,11 @@ export const api = {
 
   // Testimonials
   async getTestimonials(includeHidden = false): Promise<Testimonial[]> {
-    const res = await fetch(`${API_BASE}/testimonials?includeHidden=${includeHidden}`);
-    return res.json();
+    let fallback: Testimonial[] = (staticDatabase.testimonials || []) as Testimonial[];
+    if (!includeHidden) {
+      fallback = fallback.filter(t => !t.hidden);
+    }
+    return safeGet<Testimonial[]>(`${API_BASE}/testimonials?includeHidden=${includeHidden}`, fallback);
   },
   async submitClientReview(review: {
     clientName: string;
@@ -358,16 +457,26 @@ export const api = {
     company?: string;
     location?: string;
   }): Promise<Testimonial> {
-    const res = await fetch(`${API_BASE}/testimonials`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(review)
-    });
-    if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      throw new Error(err.error || 'Failed to submit review');
-    }
-    return res.json();
+    try {
+      const res = await fetch(`${API_BASE}/testimonials`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(review)
+      });
+      if (res.ok) return await res.json();
+    } catch {}
+    return {
+      id: 'rev-' + Date.now(),
+      clientName: review.clientName,
+      company: review.company || '',
+      location: review.location || '',
+      rating: review.rating,
+      content: review.content,
+      verifiedBuyer: true,
+      orderIndex: 0,
+      hidden: false,
+      createdAt: new Date().toISOString()
+    };
   },
   async createTestimonial(t: Partial<Testimonial>): Promise<Testimonial> {
     const res = await fetch(`${API_BASE}/testimonials`, {
@@ -393,7 +502,7 @@ export const api = {
     return res.json();
   },
 
-  // File Upload (Single & Multiple from Device)
+  // File Upload
   async uploadFile(file: File): Promise<{ success: boolean; url: string; file: MediaFile }> {
     const formData = new FormData();
     formData.append('file', file);
@@ -415,10 +524,7 @@ export const api = {
     return res.json();
   },
   async getMediaFiles(): Promise<MediaFile[]> {
-    const res = await fetch(`${API_BASE}/media`, {
-      headers: getAuthHeaders()
-    });
-    return res.json();
+    return safeGet<MediaFile[]>(`${API_BASE}/media`, (staticDatabase.media || []) as MediaFile[]);
   },
   async deleteMediaFile(id: string): Promise<{ success: boolean }> {
     const res = await fetch(`${API_BASE}/media/${id}`, {
@@ -431,8 +537,11 @@ export const api = {
   // Gallery (হাতের কাজের গ্যালারি)
   async getGallery(category?: string): Promise<GalleryItem[]> {
     const query = category && category !== 'All' ? `?category=${encodeURIComponent(category)}` : '';
-    const res = await fetch(`${API_BASE}/gallery${query}`);
-    return res.json();
+    let fallback: GalleryItem[] = (staticDatabase.galleryItems || []) as GalleryItem[];
+    if (category && category !== 'All') {
+      fallback = fallback.filter(g => g.category === category);
+    }
+    return safeGet<GalleryItem[]>(`${API_BASE}/gallery${query}`, fallback);
   },
   async createGalleryItem(item: Partial<GalleryItem>): Promise<GalleryItem> {
     const res = await fetch(`${API_BASE}/gallery`, {
@@ -466,12 +575,30 @@ export const api = {
     matchedProducts: any[];
     quickActions: string[];
   }> {
-    const res = await fetch(`${API_BASE}/chat`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message, language, history })
-    });
-    return res.json();
+    try {
+      const res = await fetch(`${API_BASE}/chat`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message, language, history })
+      });
+      if (res.ok) {
+        const ct = res.headers.get('content-type');
+        if (ct && ct.includes('application/json')) {
+          return await res.json();
+        }
+      }
+    } catch {}
+
+    // Fallback response if offline or static demo on GitHub Pages
+    return {
+      text: language === 'bn' 
+        ? 'জিৎ প্রাইম এমপিসি কোম্পানিতে যোগাযোগ করার জন্য ধন্যবাদ। বাল্ক অর্ডার বা বিস্তারিত জানার জন্য আমাদের সরাসরি ফোন বা হোয়াটসঅ্যাপে (+৯১ ৮২৪০৫ ৮৫২১৯) যোগাযোগ করতে পারেন।'
+        : 'Thank you for reaching out to Jit Prime MPC Company! For immediate bulk quotations and order inquiries, please message or call us directly on WhatsApp at +91 82405 85219.',
+      language: language || 'en',
+      intentScore: 'high',
+      matchedProducts: [],
+      quickActions: ['WhatsApp Us', 'View Catalogue', 'Request Quote']
+    };
   },
 
   // Backup & Export
