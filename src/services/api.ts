@@ -256,7 +256,7 @@ export const api = {
 
   // Tenders
   async getTenders(includeHidden = false): Promise<GovernmentTender[]> {
-    let fallback: GovernmentTender[] = (staticDatabase.governmentTenders || []) as GovernmentTender[];
+    let fallback: GovernmentTender[] = (staticDatabase.tenders || staticDatabase.governmentTenders || []) as GovernmentTender[];
     if (!includeHidden) {
       fallback = fallback.filter(t => !t.hidden);
     }
@@ -288,7 +288,7 @@ export const api = {
 
   // Campaigns
   async getCampaigns(): Promise<PujaCampaign[]> {
-    return safeGet<PujaCampaign[]>(`${API_BASE}/campaigns`, (staticDatabase.pujaCampaigns || []) as PujaCampaign[]);
+    return safeGet<PujaCampaign[]>(`${API_BASE}/campaigns`, (staticDatabase.campaigns || staticDatabase.pujaCampaigns || []) as PujaCampaign[]);
   },
   async updateCampaign(id: string, campaign: Partial<PujaCampaign>): Promise<PujaCampaign> {
     const res = await fetch(`${API_BASE}/campaigns/${id}`, {
@@ -537,7 +537,7 @@ export const api = {
   // Gallery (হাতের কাজের গ্যালারি)
   async getGallery(category?: string): Promise<GalleryItem[]> {
     const query = category && category !== 'All' ? `?category=${encodeURIComponent(category)}` : '';
-    let fallback: GalleryItem[] = (staticDatabase.galleryItems || []) as GalleryItem[];
+    let fallback: GalleryItem[] = (staticDatabase.gallery || staticDatabase.galleryItems || []) as GalleryItem[];
     if (category && category !== 'All') {
       fallback = fallback.filter(g => g.category === category);
     }
