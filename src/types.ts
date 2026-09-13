@@ -37,6 +37,7 @@ export interface Product {
   customizationAvailable: boolean;
   productionStatus: 'Ready to Ship' | 'Made to Order' | 'In Production';
   estimatedProductionTime: string;
+  leadTime?: string;
   featured: boolean;
   isNew: boolean;
   hidden?: boolean;
@@ -84,6 +85,9 @@ export interface TrainingProgram {
   title: string;
   description: string;
   skill: string;
+  craftFocus?: string;
+  batchSize?: string;
+  registrationOpen?: boolean;
   eligibility: string;
   duration: string;
   location: string;
@@ -116,9 +120,11 @@ export interface GovernmentTender {
   id: string;
   title: string;
   organization: string;
+  issuingOrganization?: string;
   year: string;
   category: string;
   description: string;
+  caseStudySnippet?: string;
   status: 'Verified Project' | 'Active Capability' | 'Empanelled' | 'Completed' | 'Documentation Ready';
   documents?: { name: string; url: string }[];
   images?: string[];
@@ -220,27 +226,47 @@ export interface FAQ {
   hidden: boolean;
 }
 
+export interface SocialProfile {
+  id: string;
+  platform: 'facebook' | 'instagram' | 'youtube' | 'whatsapp' | 'linkedin' | 'twitter' | 'pinterest' | 'telegram' | 'website' | 'other';
+  label: string;
+  url: string;
+  iconName?: string;
+  enabled?: boolean;
+}
+
 export interface SiteSettings {
   companyName: string;
+  shortName?: string;
   ownerName: string;
   tagline: string;
   phone: string;
+  secondaryPhone?: string;
+  tertiaryPhone?: string;
   whatsappNumber: string;
   email: string;
   fullAddress: string;
   googleMapsUrl?: string;
   businessHours: string;
+  generalMoq?: number;
+  bulkMoq?: number;
+  showArtisansMenu?: boolean;
+  socialProfiles?: SocialProfile[];
   socialLinks: {
     facebook?: string;
     instagram?: string;
     linkedin?: string;
     youtube?: string;
+    whatsapp?: string;
+    twitter?: string;
   };
   logoUrl?: string;
   faviconUrl?: string;
   currencySymbol: string;
   internationalShippingDisclaimer: string;
   advancePaymentPolicyNote: string;
+  shippingDisclaimer?: string;
+  visitingCardTagline?: string;
   seo: {
     metaTitle: string;
     metaDescription: string;
@@ -335,3 +361,82 @@ export interface ChatMessage {
   quickActions?: string[];
   timestamp: string;
 }
+
+export interface VideoItem {
+  id: string;
+  title: string;
+  description: string;
+  videoUrl?: string;
+  videoType?: 'upload' | 'link' | 'youtube' | 'vimeo' | 'external';
+  googleDriveUrl?: string;
+  embedUrl?: string;
+  thumbnailUrl?: string;
+  category: 'Work Video' | 'Customer Review' | 'Production Video' | 'Handmade Work' | 'Our Craft' | 'Customer Stories' | 'Other' | string;
+  featured: boolean;
+  hidden: boolean;
+  orderIndex: number;
+  createdAt: string;
+}
+
+export interface CustomSection {
+  id: string;
+  title: string;
+  subtitle?: string;
+  type?: 'text' | 'image' | 'image_text' | 'gallery' | 'video' | 'cards' | 'cta' | 'banner' | 'faq' | 'stats' | 'timeline';
+  content?: string;
+  imageUrl?: string;
+  secondaryImageUrl?: string;
+  videoUrl?: string;
+  ctaText?: string;
+  ctaLink?: string;
+  buttonText?: string;
+  buttonLink?: string;
+  backgroundColor?: string;
+  textColor?: string;
+  cards?: { title: string; description: string; icon?: string; link?: string }[];
+  stats?: { label: string; value: string; helper?: string }[];
+  hidden: boolean;
+  active?: boolean;
+  orderIndex: number;
+}
+
+export interface WorkerApplication {
+  id: string;
+  applicantName?: string;
+  name?: string;
+  phone: string;
+  whatsappNumber?: string;
+  email?: string;
+  location: string;
+  skill?: string;
+  craftSkill?: string;
+  experience?: string;
+  experienceYears?: number;
+  craftInterest?: string;
+  availability?: string;
+  dailyCapacityHours?: string;
+  hasSmartphone?: boolean;
+  message?: string;
+  workSampleUrl?: string;
+  status: 'New' | 'Contacted' | 'Shortlisted' | 'Active' | 'Not Suitable' | 'Follow-up' | 'NEW';
+  notes?: string;
+  createdAt: string;
+}
+
+export interface BannerItem {
+  id: string;
+  title: string;
+  subtitle?: string;
+  image?: string;
+  ctaText?: string;
+  ctaLink?: string;
+  startDate?: string;
+  endDate?: string;
+  countdownEnabled: boolean;
+  countdownDeadline?: string;
+  active: boolean;
+  orderIndex: number;
+}
+
+export type SiteLanguage = 'en' | 'bn';
+

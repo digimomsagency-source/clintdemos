@@ -60,7 +60,17 @@ export const AdminTrainingTab: React.FC = () => {
 
   const handleOpenEdit = (p: TrainingProgram) => {
     setEditingProgram(p);
-    setFormData({ ...p });
+    setFormData({
+      ...p,
+      title: p.title || '',
+      craftFocus: p.craftFocus || '',
+      duration: p.duration || '',
+      batchSize: p.batchSize || '',
+      eligibility: p.eligibility || '',
+      location: p.location || '',
+      description: p.description || '',
+      registrationOpen: p.registrationOpen ?? true
+    });
     setIsModalOpen(true);
   };
 
@@ -216,7 +226,7 @@ export const AdminTrainingTab: React.FC = () => {
                     <td className="p-3.5 text-slate-700">{app.craftInterest || app.message || 'General Craft'}</td>
                     <td className="p-3.5">
                       <select
-                        value={app.status}
+                        value={app.status || 'New'}
                         onChange={e => handleUpdateAppStatus(app.id, e.target.value)}
                         className="text-[11px] font-semibold bg-slate-100 border border-slate-300 rounded px-2 py-1 outline-hidden"
                       >
@@ -269,7 +279,7 @@ export const AdminTrainingTab: React.FC = () => {
                 <input
                   type="text"
                   required
-                  value={formData.title}
+                  value={formData.title || ''}
                   onChange={e => setFormData({ ...formData, title: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
                 />
@@ -280,7 +290,7 @@ export const AdminTrainingTab: React.FC = () => {
                   <label className="block font-bold text-slate-700 mb-1">Craft Focus</label>
                   <input
                     type="text"
-                    value={formData.craftFocus}
+                    value={formData.craftFocus || ''}
                     onChange={e => setFormData({ ...formData, craftFocus: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
                   />
@@ -289,7 +299,7 @@ export const AdminTrainingTab: React.FC = () => {
                   <label className="block font-bold text-slate-700 mb-1">Duration</label>
                   <input
                     type="text"
-                    value={formData.duration}
+                    value={formData.duration || ''}
                     onChange={e => setFormData({ ...formData, duration: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
                   />
@@ -301,7 +311,7 @@ export const AdminTrainingTab: React.FC = () => {
                   <label className="block font-bold text-slate-700 mb-1">Batch Size</label>
                   <input
                     type="text"
-                    value={formData.batchSize}
+                    value={formData.batchSize || ''}
                     onChange={e => setFormData({ ...formData, batchSize: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
                   />
@@ -310,7 +320,7 @@ export const AdminTrainingTab: React.FC = () => {
                   <label className="block font-bold text-slate-700 mb-1">Location</label>
                   <input
                     type="text"
-                    value={formData.location}
+                    value={formData.location || ''}
                     onChange={e => setFormData({ ...formData, location: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
                   />
@@ -321,7 +331,7 @@ export const AdminTrainingTab: React.FC = () => {
                 <label className="block font-bold text-slate-700 mb-1">Eligibility Criteria</label>
                 <input
                   type="text"
-                  value={formData.eligibility}
+                  value={formData.eligibility || ''}
                   onChange={e => setFormData({ ...formData, eligibility: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
                 />
@@ -331,7 +341,7 @@ export const AdminTrainingTab: React.FC = () => {
                 <label className="block font-bold text-slate-700 mb-1">Description & Syllabus Overview</label>
                 <textarea
                   rows={3}
-                  value={formData.description}
+                  value={formData.description || ''}
                   onChange={e => setFormData({ ...formData, description: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
                 />

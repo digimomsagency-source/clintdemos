@@ -112,7 +112,20 @@ export const AdminProductsTab: React.FC = () => {
 
   const handleOpenEdit = (p: Product) => {
     setEditingProduct(p);
-    setFormData({ ...p });
+    setFormData({
+      ...p,
+      name: p.name || '',
+      sku: p.sku || '',
+      category: p.category || (categories[0]?.id ?? 'terracotta-jewellery'),
+      productionStatus: p.productionStatus || '',
+      moq: p.moq ?? 50,
+      bulkPrice: p.bulkPrice ?? 0,
+      leadTime: p.leadTime || '',
+      shortDescription: p.shortDescription || '',
+      craftStory: p.craftStory || '',
+      featured: p.featured || false,
+      hidden: p.hidden || false
+    });
     setError(null);
     setIsModalOpen(true);
   };
@@ -220,7 +233,7 @@ export const AdminProductsTab: React.FC = () => {
           <input
             type="text"
             placeholder="Search by product name or SKU..."
-            value={search}
+            value={search || ''}
             onChange={e => setSearch(e.target.value)}
             className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs outline-hidden focus:bg-white"
           />
@@ -229,7 +242,7 @@ export const AdminProductsTab: React.FC = () => {
         <div className="flex items-center gap-2 w-full sm:w-auto">
           <span className="text-xs font-semibold text-slate-500">Category:</span>
           <select
-            value={selectedCat}
+            value={selectedCat || 'all'}
             onChange={e => setSelectedCat(e.target.value)}
             className="px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold outline-hidden"
           >
@@ -406,7 +419,7 @@ export const AdminProductsTab: React.FC = () => {
                     type="text"
                     required
                     placeholder="e.g. Royal Bengal Terracotta Necklace Set"
-                    value={formData.name}
+                    value={formData.name || ''}
                     onChange={e => setFormData({ ...formData, name: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white"
                   />
@@ -417,7 +430,7 @@ export const AdminProductsTab: React.FC = () => {
                     type="text"
                     required
                     placeholder="JP-1001"
-                    value={formData.sku}
+                    value={formData.sku || ''}
                     onChange={e => setFormData({ ...formData, sku: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white"
                   />
@@ -429,7 +442,7 @@ export const AdminProductsTab: React.FC = () => {
                 <div>
                   <label className="block font-bold text-slate-700 mb-1">Craft Category</label>
                   <select
-                    value={formData.category}
+                    value={formData.category || ''}
                     onChange={e => setFormData({ ...formData, category: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
                   >
@@ -443,7 +456,7 @@ export const AdminProductsTab: React.FC = () => {
                   <input
                     type="text"
                     placeholder="e.g. In Stock / Ready for Bulk Dispatch / Made to Order"
-                    value={formData.productionStatus}
+                    value={formData.productionStatus || ''}
                     onChange={e => setFormData({ ...formData, productionStatus: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
                   />
@@ -457,7 +470,7 @@ export const AdminProductsTab: React.FC = () => {
                   <input
                     type="number"
                     required
-                    value={formData.moq}
+                    value={formData.moq ?? ''}
                     onChange={e => setFormData({ ...formData, moq: parseInt(e.target.value, 10) || 50 })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
                   />
@@ -466,7 +479,7 @@ export const AdminProductsTab: React.FC = () => {
                   <label className="block font-bold text-slate-700 mb-1">Wholesale / Bulk Price (₹)</label>
                   <input
                     type="number"
-                    value={formData.bulkPrice}
+                    value={formData.bulkPrice ?? ''}
                     onChange={e => setFormData({ ...formData, bulkPrice: parseFloat(e.target.value) || 0 })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
                   />
@@ -476,7 +489,7 @@ export const AdminProductsTab: React.FC = () => {
                   <input
                     type="text"
                     placeholder="7 - 14 Days"
-                    value={formData.leadTime}
+                    value={formData.leadTime || ''}
                     onChange={e => setFormData({ ...formData, leadTime: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
                   />
@@ -488,7 +501,7 @@ export const AdminProductsTab: React.FC = () => {
                 <label className="block font-bold text-slate-700 mb-1">Short Description (for cards)</label>
                 <textarea
                   rows={2}
-                  value={formData.shortDescription}
+                  value={formData.shortDescription || ''}
                   onChange={e => setFormData({ ...formData, shortDescription: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
                 />
@@ -499,7 +512,7 @@ export const AdminProductsTab: React.FC = () => {
                 <textarea
                   rows={2}
                   placeholder="The story behind this artisan technique..."
-                  value={formData.craftStory}
+                  value={formData.craftStory || ''}
                   onChange={e => setFormData({ ...formData, craftStory: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
                 />

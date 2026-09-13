@@ -60,7 +60,13 @@ export const AdminAIKnowledgeTab: React.FC = () => {
 
   const handleOpenEdit = (faq: FAQ) => {
     setEditingFaq(faq);
-    setFormData({ ...faq });
+    setFormData({
+      ...faq,
+      question: faq.question || '',
+      answer: faq.answer || '',
+      category: faq.category || 'Bulk Orders',
+      hidden: faq.hidden || false
+    });
     setError(null);
     setIsModalOpen(true);
   };
@@ -248,7 +254,7 @@ export const AdminAIKnowledgeTab: React.FC = () => {
               <div>
                 <label className="block font-bold text-slate-700 mb-1">Knowledge Category</label>
                 <select
-                  value={formData.category}
+                  value={formData.category || 'Bulk Orders'}
                   onChange={e => setFormData({ ...formData, category: e.target.value as any })}
                   className="w-full px-3.5 py-2 bg-slate-50 border border-slate-300 rounded-xl"
                 >

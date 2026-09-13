@@ -210,7 +210,7 @@ export const AdminTestimonialsTab: React.FC = () => {
           <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
-            value={searchTerm}
+            value={searchTerm || ''}
             onChange={e => setSearchTerm(e.target.value)}
             placeholder="Search by client name, company, city, content..."
             className="w-full pl-9 pr-4 py-2 text-xs sm:text-sm bg-white rounded-xl border border-slate-200 focus:outline-hidden focus:border-amber-500"
@@ -344,7 +344,7 @@ export const AdminTestimonialsTab: React.FC = () => {
                 <input
                   type="text"
                   required
-                  value={formData.clientName}
+                  value={formData.clientName || ''}
                   onChange={e => setFormData({ ...formData, clientName: e.target.value })}
                   placeholder="e.g. Smt. Sumana Sen"
                   className="w-full px-3 py-2 text-xs sm:text-sm border border-slate-300 rounded-xl"
@@ -358,7 +358,7 @@ export const AdminTestimonialsTab: React.FC = () => {
                   </label>
                   <input
                     type="text"
-                    value={formData.company}
+                    value={formData.company || ''}
                     onChange={e => setFormData({ ...formData, company: e.target.value })}
                     placeholder="e.g. Banga Sanskritik Samiti"
                     className="w-full px-3 py-2 text-xs sm:text-sm border border-slate-300 rounded-xl"
@@ -370,7 +370,7 @@ export const AdminTestimonialsTab: React.FC = () => {
                   </label>
                   <input
                     type="text"
-                    value={formData.location}
+                    value={formData.location || ''}
                     onChange={e => setFormData({ ...formData, location: e.target.value })}
                     placeholder="e.g. Kolkata / USA"
                     className="w-full px-3 py-2 text-xs sm:text-sm border border-slate-300 rounded-xl"
@@ -384,7 +384,7 @@ export const AdminTestimonialsTab: React.FC = () => {
                     Star Rating (1 to 5)
                   </label>
                   <select
-                    value={formData.rating}
+                    value={formData.rating ?? 5}
                     onChange={e => setFormData({ ...formData, rating: Number(e.target.value) })}
                     className="w-full px-3 py-2 text-xs sm:text-sm border border-slate-300 rounded-xl"
                   >
@@ -399,7 +399,7 @@ export const AdminTestimonialsTab: React.FC = () => {
                   <input
                     type="checkbox"
                     id="verifiedBuyer"
-                    checked={formData.verifiedBuyer}
+                    checked={formData.verifiedBuyer || false}
                     onChange={e => setFormData({ ...formData, verifiedBuyer: e.target.checked })}
                     className="w-4 h-4 text-amber-500 rounded border-slate-300"
                   />
@@ -416,7 +416,7 @@ export const AdminTestimonialsTab: React.FC = () => {
                 <textarea
                   required
                   rows={4}
-                  value={formData.content}
+                  value={formData.content || ''}
                   onChange={e => setFormData({ ...formData, content: e.target.value })}
                   placeholder="Enter the client feedback..."
                   className="w-full px-3 py-2 text-xs sm:text-sm border border-slate-300 rounded-xl resize-none"

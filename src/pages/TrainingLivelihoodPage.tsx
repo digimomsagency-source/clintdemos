@@ -274,7 +274,7 @@ export const TrainingLivelihoodPage: React.FC = () => {
                     Select Training Program *
                   </label>
                   <select
-                    value={form.programId}
+                    value={form.programId || ''}
                     onChange={e => setForm({ ...form, programId: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs"
                   >
@@ -292,7 +292,7 @@ export const TrainingLivelihoodPage: React.FC = () => {
                     type="text"
                     required
                     placeholder="e.g. Sima Das"
-                    value={form.applicantName}
+                    value={form.applicantName || ''}
                     onChange={e => setForm({ ...form, applicantName: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs"
                   />
@@ -307,7 +307,7 @@ export const TrainingLivelihoodPage: React.FC = () => {
                       type="tel"
                       required
                       placeholder="+91 98765 43210"
-                      value={form.phone}
+                      value={form.phone || ''}
                       onChange={e => setForm({ ...form, phone: e.target.value })}
                       className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs"
                     />
@@ -319,7 +319,7 @@ export const TrainingLivelihoodPage: React.FC = () => {
                     <input
                       type="number"
                       placeholder="e.g. 28"
-                      value={form.age}
+                      value={form.age || ''}
                       onChange={e => setForm({ ...form, age: e.target.value })}
                       className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs"
                     />
@@ -333,7 +333,7 @@ export const TrainingLivelihoodPage: React.FC = () => {
                   <input
                     type="text"
                     placeholder="e.g. Belghoria, Nimta, Habra, Bankura"
-                    value={form.broadLocation}
+                    value={form.broadLocation || ''}
                     onChange={e => setForm({ ...form, broadLocation: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs"
                   />
@@ -344,7 +344,7 @@ export const TrainingLivelihoodPage: React.FC = () => {
                     Prior Craft Experience
                   </label>
                   <select
-                    value={form.priorCraftExperience}
+                    value={form.priorCraftExperience || 'Beginner (No prior experience)'}
                     onChange={e => setForm({ ...form, priorCraftExperience: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs"
                   >
@@ -362,7 +362,7 @@ export const TrainingLivelihoodPage: React.FC = () => {
                   <textarea
                     rows={2}
                     placeholder="Any questions or specific craft interests..."
-                    value={form.notes}
+                    value={form.notes || ''}
                     onChange={e => setForm({ ...form, notes: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg text-xs"
                   />

@@ -1,14 +1,40 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Edit, Trash2, Users, MapPin, Award, X, Save, Eye, EyeOff } from 'lucide-react';
+import { Plus, Edit, Trash2, Users, MapPin, Award, X, Save, Eye, EyeOff, Globe } from 'lucide-react';
 import { api } from '../../services/api';
 import { Artisan } from '../../types';
+import { useApp } from '../../context/AppContext';
 import { SingleImageUpload } from '../../components/ImageUploadField';
 
 export const AdminArtisansTab: React.FC = () => {
+  const { settings, navigation, refreshData } = useApp();
   const [artisans, setArtisans] = useState<Artisan[]>([]);
   const [loading, setLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingArtisan, setEditingArtisan] = useState<Artisan | null>(null);
+  const [menuToggling, setMenuToggling] = useState(false);
+
+  const isMenuVisible = settings?.showArtisansMenu !== false && !(navigation || []).find(n => n.route === '/our-artisans' || n.route === '/artisans')?.hidden;
+
+  const handleToggleArtisansMenu = async () => {
+    setMenuToggling(true);
+    try {
+      const nextVisible = !isMenuVisible;
+      await api.updateSettings({ showArtisansMenu: nextVisible });
+      if (navigation && navigation.length > 0) {
+        const updatedNav = navigation.map(n => 
+          (n.route === '/our-artisans' || n.route === '/artisans')
+            ? { ...n, hidden: !nextVisible }
+            : n
+        );
+        await api.updateNavigation(updatedNav);
+      }
+      await refreshData();
+    } catch (err) {
+      console.error('Failed to toggle menu:', err);
+    } finally {
+      setMenuToggling(false);
+    }
+  };
 
   const [formData, setFormData] = useState<Partial<Artisan>>({
     name: '',
@@ -58,8 +84,16 @@ export const AdminArtisansTab: React.FC = () => {
 
   const handleOpenEdit = (a: Artisan) => {
     setEditingArtisan(a);
-    setFormData({ ...a });
-    setSkillsInput(a.skills.join(', '));
+    setFormData({
+      ...a,
+      name: a.name || '',
+      craft: a.craft || '',
+      experienceYears: a.experienceYears ?? 1,
+      broadLocation: a.broadLocation || '',
+      story: a.story || '',
+      hidden: a.hidden || false
+    });
+    setSkillsInput(Array.isArray(a.skills) ? a.skills.join(', ') : '');
     setIsModalOpen(true);
   };
 
@@ -95,6 +129,58 @@ export const AdminArtisansTab: React.FC = () => {
 
   return (
     <div className="space-y-6">
+      {/* Public Menu Visibility Control Banner */}
+      <div className={`p-4 sm:p-5 rounded-2xl border transition-all flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 ${
+        isMenuVisible
+          ? 'bg-emerald-50/70 border-emerald-200 text-emerald-950'
+          : 'bg-amber-50/80 border-amber-200 text-amber-950'
+      }`}>
+        <div className="flex items-center gap-3">
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
+            isMenuVisible ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-800'
+          }`}>
+            {isMenuVisible ? <Eye className="w-5 h-5" /> : <EyeOff className="w-5 h-5" />}
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm font-bold">
+                ওয়েবসাইট মেনু স্ট্যাটাস: &ldquo;Our Artisans&rdquo;
+              </h3>
+              <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-wider ${
+                isMenuVisible ? 'bg-emerald-200 text-emerald-900' : 'bg-red-100 text-red-700'
+              }`}>
+                {isMenuVisible ? 'চালু (Active / Visible)' : 'বন্ধ (Off / Hidden)'}
+              </span>
+            </div>
+            <p className="text-xs text-slate-600 mt-0.5">
+              {isMenuVisible
+                ? 'ওয়েবসাইটের হেডার মেনু ও ফোটারে "আমাদের কারিগর" (Our Artisans) লিংক সক্রিয় আছে।'
+                : 'ওয়েবসাইট থেকে "আমাদের কারিগর" মেনু লিংকটি বন্ধ করা আছে। (এখানে ডেমো প্রোফাইল সংরক্ষণ আছে, প্রয়োজনমতো চালু করতে পারেন)'}
+            </p>
+          </div>
+        </div>
+
+        <button
+          type="button"
+          onClick={handleToggleArtisansMenu}
+          disabled={menuToggling}
+          className={`px-4 py-2 rounded-xl text-xs font-bold transition-colors shrink-0 shadow-xs cursor-pointer flex items-center gap-1.5 ${
+            isMenuVisible
+              ? 'bg-red-600 hover:bg-red-700 text-white'
+              : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+          }`}
+        >
+          {isMenuVisible ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+          <span>
+            {menuToggling 
+              ? 'আপডেট হচ্ছে...' 
+              : isMenuVisible 
+                ? 'মেনু বন্ধ করুন (Turn OFF Menu)' 
+                : 'মেনু চালু করুন (Turn ON Menu)'}
+          </span>
+        </button>
+      </div>
+
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h2 className="text-xl font-bold text-slate-900 font-serif-heading">
@@ -192,7 +278,7 @@ export const AdminArtisansTab: React.FC = () => {
                 <input
                   type="text"
                   required
-                  value={formData.name}
+                  value={formData.name || ''}
                   onChange={e => setFormData({ ...formData, name: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
                 />
@@ -203,7 +289,7 @@ export const AdminArtisansTab: React.FC = () => {
                   <label className="block font-bold text-slate-700 mb-1">Craft Focus</label>
                   <input
                     type="text"
-                    value={formData.craft}
+                    value={formData.craft || ''}
                     onChange={e => setFormData({ ...formData, craft: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
                   />
@@ -212,7 +298,7 @@ export const AdminArtisansTab: React.FC = () => {
                   <label className="block font-bold text-slate-700 mb-1">Years of Experience</label>
                   <input
                     type="number"
-                    value={formData.experienceYears}
+                    value={formData.experienceYears ?? ''}
                     onChange={e => setFormData({ ...formData, experienceYears: parseInt(e.target.value, 10) || 1 })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
                   />
@@ -223,7 +309,7 @@ export const AdminArtisansTab: React.FC = () => {
                 <label className="block font-bold text-slate-700 mb-1">Area / Location</label>
                 <input
                   type="text"
-                  value={formData.broadLocation}
+                  value={formData.broadLocation || ''}
                   onChange={e => setFormData({ ...formData, broadLocation: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
                 />
@@ -233,7 +319,7 @@ export const AdminArtisansTab: React.FC = () => {
                 <label className="block font-bold text-slate-700 mb-1">Skills (comma separated)</label>
                 <input
                   type="text"
-                  value={skillsInput}
+                  value={skillsInput || ''}
                   onChange={e => setSkillsInput(e.target.value)}
                   placeholder="Clay preparation, Firing, Moulding"
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
@@ -244,7 +330,7 @@ export const AdminArtisansTab: React.FC = () => {
                 <label className="block font-bold text-slate-700 mb-1">Artisan Craft Journey Story</label>
                 <textarea
                   rows={3}
-                  value={formData.story}
+                  value={formData.story || ''}
                   onChange={e => setFormData({ ...formData, story: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
                 />

@@ -14,7 +14,11 @@ import {
   NavigationItem, 
   BulkEnquiryLead,
   MediaFile,
-  GalleryItem
+  GalleryItem,
+  VideoItem,
+  CustomSection,
+  WorkerApplication,
+  BannerItem
 } from '../types';
 import { staticDatabase } from '../data/staticDb';
 
@@ -565,6 +569,140 @@ export const api = {
       headers: getAuthHeaders()
     });
     return res.json();
+  },
+
+  // Videos (Production & Artisan Craft Videos)
+  async getVideos(params?: { includeHidden?: boolean; featured?: boolean }): Promise<VideoItem[]> {
+    let fallback: VideoItem[] = (staticDatabase.videos || []) as VideoItem[];
+    if (!params?.includeHidden) {
+      fallback = fallback.filter(v => !v.hidden);
+    }
+    if (params?.featured) {
+      fallback = fallback.filter(v => v.featured);
+    }
+    return safeGet<VideoItem[]>(`${API_BASE}/videos${params?.includeHidden ? '?includeHidden=true' : ''}`, fallback);
+  },
+  async createVideo(video: Partial<VideoItem>): Promise<VideoItem> {
+    const res = await fetch(`${API_BASE}/videos`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(video)
+    });
+    return res.json();
+  },
+  async updateVideo(id: string, video: Partial<VideoItem>): Promise<VideoItem> {
+    const res = await fetch(`${API_BASE}/videos/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(video)
+    });
+    return res.json();
+  },
+  async deleteVideo(id: string): Promise<{ success: boolean }> {
+    const res = await fetch(`${API_BASE}/videos/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    return res.json();
+  },
+
+  // Banners
+  async getBanners(): Promise<BannerItem[]> {
+    const fallback: BannerItem[] = (staticDatabase.banners || []) as BannerItem[];
+    return safeGet<BannerItem[]>(`${API_BASE}/banners`, fallback);
+  },
+  async createBanner(banner: Partial<BannerItem>): Promise<BannerItem> {
+    const res = await fetch(`${API_BASE}/banners`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(banner)
+    });
+    return res.json();
+  },
+  async updateBanner(id: string, banner: Partial<BannerItem>): Promise<BannerItem> {
+    const res = await fetch(`${API_BASE}/banners/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(banner)
+    });
+    return res.json();
+  },
+  async deleteBanner(id: string): Promise<{ success: boolean }> {
+    const res = await fetch(`${API_BASE}/banners/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    return res.json();
+  },
+
+  // Custom Sections
+  async getCustomSections(): Promise<CustomSection[]> {
+    const fallback: CustomSection[] = (staticDatabase.customSections || []) as CustomSection[];
+    return safeGet<CustomSection[]>(`${API_BASE}/custom-sections`, fallback);
+  },
+  async createCustomSection(section: Partial<CustomSection>): Promise<CustomSection> {
+    const res = await fetch(`${API_BASE}/custom-sections`, {
+      method: 'POST',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(section)
+    });
+    return res.json();
+  },
+  async updateCustomSection(id: string, section: Partial<CustomSection>): Promise<CustomSection> {
+    const res = await fetch(`${API_BASE}/custom-sections/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(section)
+    });
+    return res.json();
+  },
+  async deleteCustomSection(id: string): Promise<{ success: boolean }> {
+    const res = await fetch(`${API_BASE}/custom-sections/${id}`, {
+      method: 'DELETE',
+      headers: getAuthHeaders()
+    });
+    return res.json();
+  },
+
+  // Worker Applications (Women Artisan & Local Worker Submissions)
+  async getWorkerApplications(): Promise<WorkerApplication[]> {
+    const fallback: WorkerApplication[] = (staticDatabase.workerApplications || []) as WorkerApplication[];
+    return safeGet<WorkerApplication[]>(`${API_BASE}/worker-applications`, fallback);
+  },
+  async submitWorkerApplication(app: Partial<WorkerApplication>): Promise<{ success: boolean; application?: WorkerApplication }> {
+    try {
+      const res = await fetch(`${API_BASE}/worker-applications`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(app)
+      });
+      if (res.ok) {
+        return await res.json();
+      }
+    } catch {}
+    return { success: true };
+  },
+  async updateWorkerApplication(id: string, app: Partial<WorkerApplication>): Promise<WorkerApplication> {
+    const res = await fetch(`${API_BASE}/worker-applications/${id}`, {
+      method: 'PUT',
+      headers: getAuthHeaders(),
+      body: JSON.stringify(app)
+    });
+    return res.json();
+  },
+
+  // Password update
+  async changePassword(newPassword: string, oldPassword?: string): Promise<{ success: boolean; message?: string; error?: string }> {
+    try {
+      const res = await fetch(`${API_BASE}/auth/change-password`, {
+        method: 'POST',
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ oldPassword: oldPassword || '', newPassword })
+      });
+      return await res.json();
+    } catch (err: any) {
+      return { success: false, error: err.message || 'Failed to change password' };
+    }
   },
 
   // AI Chat

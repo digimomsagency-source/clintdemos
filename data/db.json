@@ -1,21 +1,58 @@
 {
   "settings": {
     "companyName": "JIT PRIME MPC COMPANY",
+    "shortName": "JIT PRIME MPC",
     "ownerName": "MONOJIT DEY",
     "tagline": "Your Trust Our Priority",
-    "phone": "+91 82405 85219",
-    "whatsappNumber": "+91 82405 85219",
+    "phone": "+91 8240585219",
+    "secondaryPhone": "+91 8073836537",
+    "tertiaryPhone": "+91 8906801895",
+    "whatsappNumber": "+91 8240585219",
     "email": "monojitdey189@gmail.com",
-    "fullAddress": "Belghoria, Nimta, Khudiram Pally, Near 42 Pally Club, Landmark - Harijon School, Kolkata - 700049, West Bengal, India.",
+    "fullAddress": "BELGHORIA NIMTA, KHUDIRAM PALLY, NEAR 42 PALLY CLUB, LAND MARK - HORIJON SCHOOL, KOL - 49, WEST BENGAL, INDIA",
     "googleMapsUrl": "https://maps.google.com/?q=Nimta+Belghoria+Kolkata+700049",
-    "businessHours": "Monday - Saturday: 10:00 AM - 8:00 PM IST",
+    "businessHours": "24/7 (Open 24 Hours, 7 Days a Week)",
+    "generalMoq": 25,
+    "bulkMoq": 1000,
+    "showArtisansMenu": true,
+    "socialProfiles": [
+      {
+        "id": "soc-ig",
+        "platform": "instagram",
+        "label": "Instagram",
+        "url": "https://instagram.com/jitprimempc",
+        "enabled": true
+      },
+      {
+        "id": "soc-fb",
+        "platform": "facebook",
+        "label": "Facebook",
+        "url": "https://facebook.com/jitprimempc",
+        "enabled": true
+      },
+      {
+        "id": "soc-yt",
+        "platform": "youtube",
+        "label": "YouTube",
+        "url": "https://youtube.com/@jitprimempc",
+        "enabled": true
+      },
+      {
+        "id": "soc-wa",
+        "platform": "whatsapp",
+        "label": "WhatsApp",
+        "url": "https://wa.me/918240585219",
+        "enabled": true
+      }
+    ],
     "socialLinks": {
-      "facebook": "https://facebook.com",
-      "instagram": "https://instagram.com",
+      "facebook": "https://facebook.com/jitprimempc",
+      "instagram": "https://instagram.com/jitprimempc",
       "linkedin": "https://linkedin.com",
-      "youtube": "https://youtube.com"
+      "youtube": "https://youtube.com/@jitprimempc",
+      "whatsapp": "https://wa.me/918240585219"
     },
-    "logoUrl": "",
+    "logoUrl": "/uploads/large-1789288040003-764372011.png",
     "faviconUrl": "",
     "currencySymbol": "₹",
     "internationalShippingDisclaimer": "International shipping, customs clearance, duties, documentation and delivery timelines are confirmed according to the product type, order volume, destination country and mutually agreed quotation.",
@@ -26,9 +63,19 @@
       "keywords": "Hasta Shilpa, Indian handicrafts, bulk handmade jewellery, terracotta clay art, Dokra, women artisans Kolkata, West Bengal handicrafts, Govt Tender supplier Kolkata",
       "ogTitle": "Jit Prime MPC Company - Authentic Hasta Shilpa & Institutional Handicrafts",
       "ogDescription": "Your Trust Our Priority. Bulk Indian crafts, govt tender procurement & export quality handmade goods by Monojit Dey."
-    }
+    },
+    "visitingCardTagline": "Handmade Clay & Terracotta Jewellery Manufacturing from West Bengal"
   },
   "categories": [
+    {
+      "id": "cat-clay",
+      "name": "Clay Handmade",
+      "slug": "clay-handmade",
+      "description": "Authentic clay handmade products, terracotta idols, artistic wall plaques, rural pottery and festive diyas.",
+      "image": "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=800&q=80",
+      "hidden": false,
+      "orderIndex": 1
+    },
     {
       "id": "cat-1",
       "name": "Handmade Jewellery",
@@ -36,16 +83,16 @@
       "description": "Exquisite clay, terracotta, bead, and brass handcrafted jewellery created with traditional Bengali craft techniques.",
       "image": "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=800&q=80",
       "hidden": false,
-      "orderIndex": 1
+      "orderIndex": 2
     },
     {
       "id": "cat-2",
-      "name": "Hasta Shilpa / Clay Art",
-      "slug": "hasta-shilpa-clay-art",
-      "description": "Authentic terracotta idols, artistic wall plaques, home decor pieces and traditional rural pottery.",
-      "image": "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=800&q=80",
+      "name": "Hasta Shilpa",
+      "slug": "hasta-shilpa",
+      "description": "Authentic terracotta idols, artistic wall plaques, heritage Indian handicrafts and traditional rural pottery.",
+      "image": "https://images.unsplash.com/photo-1582562124811-c09040d0a901?auto=format&fit=crop&w=800&q=80",
       "hidden": false,
-      "orderIndex": 2
+      "orderIndex": 3
     },
     {
       "id": "cat-3",
@@ -54,7 +101,7 @@
       "description": "Authentic Kantha stitch pouches, hand-embroidered stoles, traditional batik and jute bags.",
       "image": "https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?auto=format&fit=crop&w=800&q=80",
       "hidden": false,
-      "orderIndex": 3
+      "orderIndex": 4
     },
     {
       "id": "cat-4",
@@ -63,7 +110,7 @@
       "description": "Festive diya sets, hand-painted wooden craft, decorative metalware and traditional living accents.",
       "image": "https://images.unsplash.com/photo-1513519245088-0e12902e5a38?auto=format&fit=crop&w=800&q=80",
       "hidden": false,
-      "orderIndex": 4
+      "orderIndex": 5
     },
     {
       "id": "cat-5",
@@ -71,15 +118,6 @@
       "slug": "custom-crafts",
       "description": "Customized institutional gifts, government event mementos, corporate gift hampers and festival specials.",
       "image": "https://images.unsplash.com/photo-1549465220-1a8b9238cd48?auto=format&fit=crop&w=800&q=80",
-      "hidden": false,
-      "orderIndex": 5
-    },
-    {
-      "id": "cat-6",
-      "name": "Other Handcrafted Products",
-      "slug": "other-handcrafted",
-      "description": "Seasonal festival items, bamboo craft, handmade paper items and eco-friendly artisan creations.",
-      "image": "https://images.unsplash.com/photo-1582533561751-ef6f6ab93a2e?auto=format&fit=crop&w=800&q=80",
       "hidden": false,
       "orderIndex": 6
     }
@@ -364,38 +402,38 @@
   "artisans": [
     {
       "id": "artisan-1",
-      "name": "Anjali M.",
+      "name": "Anjali Mondal",
       "artisanCode": "ART-WB-01",
       "photo": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80",
       "craft": "Terracotta Relief & Jewellery Sculpting",
       "productCategory": "Handmade Jewellery & Clay Art",
-      "experienceYears": 6,
-      "story": "Trained in regional clay shaping traditions, Anjali leads a cluster of 8 women artisans in preparing miniature terracotta beads, pendants, and decorative figurines for bulk festive collections.",
+      "experienceYears": 7,
+      "story": "Trained in regional clay shaping traditions in Nimta, Anjali leads a cluster of 12 women artisans preparing miniature terracotta beads, Maa Durga relief pendants, and festive jewellery sets for bulk orders.",
       "skills": [
         "Clay Kneading",
         "Relief Embossing",
-        "Non-toxic Colouring",
+        "Non-toxic Organic Colouring",
         "Jute Knotting"
       ],
       "productsCreated": [
         "Handcrafted Terracotta Jewellery",
         "Festive Diyas",
-        "Miniature Idols"
+        "Miniature Clay Idols"
       ],
-      "broadLocation": "Kolkata Peri-Urban Cluster, West Bengal",
+      "broadLocation": "Belghoria & Nimta Cluster, Kolkata",
       "featured": true,
       "hidden": false,
       "orderIndex": 1
     },
     {
       "id": "artisan-2",
-      "name": "Sunita D.",
+      "name": "Sunita Das",
       "artisanCode": "ART-WB-02",
       "photo": "https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=600&q=80",
       "craft": "Kantha Running-Stitch Embroidery",
       "productCategory": "Textiles & Fabric Crafts",
-      "experienceYears": 9,
-      "story": "Specializing in traditional Bengal Kantha needlecraft, Sunita supervises fabric quality, thread tension, and pattern continuity across custom corporate pouch and textile orders.",
+      "experienceYears": 10,
+      "story": "Specializing in traditional Bengal Nakshi Kantha needlecraft, Sunita supervises fabric cutting, thread tension, and pattern continuity across custom corporate pouches and conference stoles.",
       "skills": [
         "Geometric Kantha Stitch",
         "Fabric Cutting",
@@ -414,13 +452,13 @@
     },
     {
       "id": "artisan-3",
-      "name": "Parvati B.",
+      "name": "Parvati Biswas",
       "artisanCode": "ART-WB-03",
       "photo": "https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?auto=format&fit=crop&w=600&q=80",
       "craft": "Jute & Natural Fiber Assembly",
       "productCategory": "Bags & Home Accessories",
-      "experienceYears": 4,
-      "story": "After completing workshop training in precision sewing of heavy jute fabric, Parvati now crafts eco-friendly conference files and export gift bags with clean edge finishing.",
+      "experienceYears": 5,
+      "story": "After completing workshop training in heavy raw jute processing, Parvati crafts eco-friendly conference files, seminar folders, and export gift bags with clean piping and reinforced handles.",
       "skills": [
         "Industrial Sewing Machine",
         "Handle Reinforcement",
@@ -436,6 +474,81 @@
       "featured": true,
       "hidden": false,
       "orderIndex": 3
+    },
+    {
+      "id": "artisan-4",
+      "name": "Rupa Karmakar",
+      "artisanCode": "ART-WB-04",
+      "photo": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80",
+      "craft": "Terracotta Wall Relief & Idol Sculpting",
+      "productCategory": "Clay Wall Art & Home Decor",
+      "experienceYears": 8,
+      "story": "Rupa crafts detailed terracotta wall plaques depicting Maa Durga motifs and rural Bengal village scenes, kiln-fired to a rich earthen tone for domestic and overseas architectural decor.",
+      "skills": [
+        "Wall Plaque Moulding",
+        "Bankura Motif Embossing",
+        "Traditional Kiln Firing",
+        "Protective Lacquer Application"
+      ],
+      "productsCreated": [
+        "Maa Durga Relief Plaques",
+        "Temple Architectural Tiles",
+        "Decorative Clay Plates"
+      ],
+      "broadLocation": "Bankura - Kolkata Artisan Cluster",
+      "featured": true,
+      "hidden": false,
+      "orderIndex": 4
+    },
+    {
+      "id": "artisan-5",
+      "name": "Basanti Soren",
+      "artisanCode": "ART-WB-05",
+      "photo": "https://images.unsplash.com/photo-1580489944761-15a19d654956?auto=format&fit=crop&w=600&q=80",
+      "craft": "Bamboo, Cane & Natural Weaving",
+      "productCategory": "Eco Crafts & Gifting",
+      "experienceYears": 6,
+      "story": "Using sustainable bamboo and cane sourced from rural Bengal, Basanti produces lightweight gift boxes, fruit baskets, and lampshades for eco-conscious institutions.",
+      "skills": [
+        "Bamboo Slicing",
+        "Interlocking Weave",
+        "Natural Herbal Polish",
+        "Structure Assembly"
+      ],
+      "productsCreated": [
+        "Handmade Bamboo Gift Hampers",
+        "Eco Storage Baskets",
+        "Woven Lampshades"
+      ],
+      "broadLocation": "Purulia - Jhargram Belt, West Bengal",
+      "featured": false,
+      "hidden": false,
+      "orderIndex": 5
+    },
+    {
+      "id": "artisan-6",
+      "name": "Mitali Roy",
+      "artisanCode": "ART-WB-06",
+      "photo": "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?auto=format&fit=crop&w=600&q=80",
+      "craft": "Hand-painted Terracotta Diyas & Festive Puja Art",
+      "productCategory": "Festive Craft & Puja Items",
+      "experienceYears": 5,
+      "story": "Mitali heads seasonal bulk Diya casting and organic decorative hand-painting for Durga Puja, Diwali, and corporate festive gift boxes across West Bengal.",
+      "skills": [
+        "Fine Brushwork",
+        "Waterproof Organic Coating",
+        "Miniature Diya Casting",
+        "Festive Box Packaging"
+      ],
+      "productsCreated": [
+        "Hand-painted Terracotta Diyas",
+        "Puja Thali Sets",
+        "Festive Gift Accents"
+      ],
+      "broadLocation": "Nadia - Kolkata Peri-Urban Belt",
+      "featured": true,
+      "hidden": false,
+      "orderIndex": 6
     }
   ],
   "trainingPrograms": [
@@ -998,7 +1111,26 @@
       "updatedAt": "2026-09-11T02:46:42.946Z"
     }
   ],
-  "media": [],
+  "media": [
+    {
+      "id": "media-1789288040005",
+      "filename": "large-1789288040003-764372011.png",
+      "originalName": "large.png",
+      "url": "/uploads/large-1789288040003-764372011.png",
+      "mimeType": "image/png",
+      "size": 70054,
+      "uploadedAt": "2026-09-13T08:27:20.005Z"
+    },
+    {
+      "id": "media-1789288004042",
+      "filename": "large-1789288004037-101544153.png",
+      "originalName": "large.png",
+      "url": "/uploads/large-1789288004037-101544153.png",
+      "mimeType": "image/png",
+      "size": 70054,
+      "uploadedAt": "2026-09-13T08:26:44.042Z"
+    }
+  ],
   "gallery": [
     {
       "id": "gal-1",
@@ -1073,10 +1205,61 @@
       "createdAt": "2026-09-11T07:00:00.000Z"
     }
   ],
+  "videos": [
+    {
+      "id": "vid-1",
+      "title": "Handmade Terracotta Jewellery Workshop & Artisan Crafting",
+      "description": "Watch our skilled women artisans in Nimta moulding, baking and detailing exquisite clay jewellery pieces.",
+      "googleDriveUrl": "https://drive.google.com/file/d/1demo-terracotta-jewellery/view",
+      "embedUrl": "",
+      "thumbnailUrl": "https://images.unsplash.com/photo-1535632066927-ab7c9ab60908?auto=format&fit=crop&w=800&q=80",
+      "category": "Work Video",
+      "featured": true,
+      "hidden": false,
+      "orderIndex": 1,
+      "createdAt": "2026-09-12T10:00:00.000Z"
+    },
+    {
+      "id": "vid-2",
+      "title": "Artisanal Bankura Clay Horse Moulding & Folk Decor Production",
+      "description": "Authentic clay handmade manufacturing in Bengal connecting heritage craft with wholesale and bulk buyers.",
+      "googleDriveUrl": "https://drive.google.com/file/d/1demo-bankura-clay-work/view",
+      "embedUrl": "",
+      "thumbnailUrl": "https://images.unsplash.com/photo-1582562124811-c09040d0a901?auto=format&fit=crop&w=800&q=80",
+      "category": "Production Video",
+      "featured": true,
+      "hidden": false,
+      "orderIndex": 2,
+      "createdAt": "2026-09-12T10:00:00.000Z"
+    }
+  ],
+  "banners": [
+    {
+      "id": "banner-1",
+      "title": "Durga Puja Festive Bulk Bookings 2026",
+      "subtitle": "Authentic Terracotta Jewellery & Bengali Folk Art",
+      "image": "https://images.unsplash.com/photo-1578749556568-bc2c40e68b61?auto=format&fit=crop&w=1200&q=80",
+      "ctaText": "Request Bulk Quote",
+      "ctaLink": "/bulk-orders",
+      "countdownEnabled": true,
+      "countdownDeadline": "2026-10-15T00:00:00.000Z",
+      "active": true,
+      "orderIndex": 1
+    }
+  ],
+  "customSections": [],
+  "workerApplications": [],
   "adminUsers": [
     {
-      "id": "admin-1",
+      "id": "admin-setup",
       "username": "admin",
+      "email": "admin@gmail.com",
+      "passwordHash": "Jit@123",
+      "role": "superadmin"
+    },
+    {
+      "id": "admin-1",
+      "username": "admin_jitprime",
       "email": "admin@jitprime.com",
       "passwordHash": "admin123",
       "role": "superadmin"

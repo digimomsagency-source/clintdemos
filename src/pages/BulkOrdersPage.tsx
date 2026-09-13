@@ -192,7 +192,7 @@ export const BulkOrdersPage: React.FC = () => {
                     type="text"
                     required
                     placeholder="e.g. Ramesh Chandra"
-                    value={formData.name}
+                    value={formData.name || ''}
                     onChange={e => setFormData({ ...formData, name: e.target.value })}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500 outline-hidden"
                   />
@@ -204,7 +204,7 @@ export const BulkOrdersPage: React.FC = () => {
                   <input
                     type="text"
                     placeholder="e.g. Bengal Heritage Emporium"
-                    value={formData.companyName}
+                    value={formData.companyName || ''}
                     onChange={e => setFormData({ ...formData, companyName: e.target.value })}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500 outline-hidden"
                   />
@@ -221,7 +221,7 @@ export const BulkOrdersPage: React.FC = () => {
                     type="tel"
                     required
                     placeholder="+91 98765 43210"
-                    value={formData.whatsapp}
+                    value={formData.whatsapp || ''}
                     onChange={e => setFormData({ ...formData, whatsapp: e.target.value })}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500 outline-hidden"
                   />
@@ -233,7 +233,7 @@ export const BulkOrdersPage: React.FC = () => {
                   <input
                     type="email"
                     placeholder="purchase@company.com"
-                    value={formData.email}
+                    value={formData.email || ''}
                     onChange={e => setFormData({ ...formData, email: e.target.value })}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500 outline-hidden"
                   />
@@ -250,7 +250,7 @@ export const BulkOrdersPage: React.FC = () => {
                     type="text"
                     required
                     placeholder="e.g. Terracotta Necklaces, Dokra Mementos, Clay Pots"
-                    value={formData.productOrCategory}
+                    value={formData.productOrCategory || ''}
                     onChange={e => setFormData({ ...formData, productOrCategory: e.target.value })}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500 outline-hidden"
                   />
@@ -263,7 +263,7 @@ export const BulkOrdersPage: React.FC = () => {
                     type="text"
                     required
                     placeholder="e.g. 250 pcs"
-                    value={formData.quantity}
+                    value={formData.quantity || ''}
                     onChange={e => setFormData({ ...formData, quantity: e.target.value })}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500 outline-hidden"
                   />
@@ -279,7 +279,7 @@ export const BulkOrdersPage: React.FC = () => {
                   <input
                     type="text"
                     placeholder="e.g. India, United States, UK"
-                    value={formData.country}
+                    value={formData.country || ''}
                     onChange={e => setFormData({ ...formData, country: e.target.value })}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500 outline-hidden"
                   />
@@ -291,7 +291,7 @@ export const BulkOrdersPage: React.FC = () => {
                   <input
                     type="text"
                     placeholder="e.g. Mumbai, New Delhi, London"
-                    value={formData.destination}
+                    value={formData.destination || ''}
                     onChange={e => setFormData({ ...formData, destination: e.target.value })}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500 outline-hidden"
                   />
@@ -320,7 +320,7 @@ export const BulkOrdersPage: React.FC = () => {
                   <input
                     type="text"
                     placeholder="Custom engraving, specific pantone shades, logo printing..."
-                    value={formData.customizationRequirement}
+                    value={formData.customizationRequirement || ''}
                     onChange={e => setFormData({ ...formData, customizationRequirement: e.target.value })}
                     className="w-full px-3 py-2 bg-white border border-amber-300 rounded-lg text-xs"
                   />
@@ -335,7 +335,7 @@ export const BulkOrdersPage: React.FC = () => {
                 <textarea
                   rows={3}
                   placeholder="Target budget per unit, corrugated box packaging, or specific timeline constraints..."
-                  value={formData.message}
+                  value={formData.message || ''}
                   onChange={e => setFormData({ ...formData, message: e.target.value })}
                   className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500 outline-hidden"
                 />

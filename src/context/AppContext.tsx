@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { SiteSettings, NavigationItem, PujaCampaign, Category, Product } from '../types';
 import { api } from '../services/api';
+import { staticDatabase } from '../data/staticDb';
+import { TranslationDict, getTranslation, Language } from '../utils/translations';
 
 interface AppContextType {
   settings: SiteSettings | null;
@@ -9,6 +11,7 @@ interface AppContextType {
   categories: Category[];
   currentLanguage: 'en' | 'bn' | 'hi';
   setLanguage: (lang: 'en' | 'bn' | 'hi') => void;
+  dict: TranslationDict;
   isAdmin: boolean;
   isAdminLoggedIn: boolean;
   adminUser: any | null;
@@ -81,11 +84,23 @@ const translations: Record<string, Record<'en' | 'bn' | 'hi', string>> = {
 };
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [settings, setSettings] = useState<SiteSettings | null>(null);
-  const [navigation, setNavigation] = useState<NavigationItem[]>([]);
-  const [campaign, setCampaign] = useState<PujaCampaign | null>(null);
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [currentLanguage, setLanguage] = useState<'en' | 'bn' | 'hi'>('en');
+  const [settings, setSettings] = useState<SiteSettings | null>(() => staticDatabase.settings || null);
+  const [navigation, setNavigation] = useState<NavigationItem[]>(() => staticDatabase.navigation || []);
+  const [campaign, setCampaign] = useState<PujaCampaign | null>(() => {
+    const camps = staticDatabase.campaigns || [];
+    return camps.find((c: any) => c.enabled) || camps[0] || null;
+  });
+  const [categories, setCategories] = useState<Category[]>(() => staticDatabase.categories || []);
+  const [currentLanguage, setCurrentLanguageState] = useState<'en' | 'bn' | 'hi'>(() => {
+    const saved = localStorage.getItem('jit_language');
+    if (saved === 'bn' || saved === 'en' || saved === 'hi') return saved;
+    return 'en';
+  });
+
+  const setLanguage = (lang: 'en' | 'bn' | 'hi') => {
+    localStorage.setItem('jit_language', lang);
+    setCurrentLanguageState(lang);
+  };
 
   // Admin Auth
   const [adminToken, setAdminToken] = useState<string | null>(localStorage.getItem('jit_admin_token'));
@@ -155,7 +170,12 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     setBulkModalProduct(null);
   };
 
+  const dict = getTranslation(currentLanguage);
+
   const t = (key: string): string => {
+    if ((dict as any)[key]) {
+      return (dict as any)[key];
+    }
     if (translations[key] && translations[key][currentLanguage]) {
       return translations[key][currentLanguage];
     }
@@ -171,6 +191,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         categories,
         currentLanguage,
         setLanguage,
+        dict,
         isAdmin: !!adminToken,
         isAdminLoggedIn: !!adminToken,
         adminUser,

@@ -64,7 +64,15 @@ export const AdminCategoriesTab: React.FC = () => {
 
   const handleOpenEdit = (c: Category) => {
     setEditingCategory(c);
-    setFormData({ ...c });
+    setFormData({
+      ...c,
+      name: c.name || '',
+      slug: c.slug || '',
+      description: c.description || '',
+      image: c.image || '',
+      hidden: c.hidden ?? false,
+      orderIndex: c.orderIndex ?? 1
+    });
     setError(null);
     setIsModalOpen(true);
   };

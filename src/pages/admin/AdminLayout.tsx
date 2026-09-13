@@ -17,7 +17,9 @@ import {
   FileText,
   Bot,
   GraduationCap,
-  Star
+  Star,
+  Video,
+  CheckCircle2
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { AdminDashboardTab } from './AdminDashboardTab';
@@ -25,6 +27,10 @@ import { AdminProductsTab } from './AdminProductsTab';
 import { AdminCategoriesTab } from './AdminCategoriesTab';
 import { AdminLeadsTab } from './AdminLeadsTab';
 import { AdminArtisansTab } from './AdminArtisansTab';
+import { AdminWorkersTab } from './AdminWorkersTab';
+import { AdminVideosTab } from './AdminVideosTab';
+import { AdminBannersTab } from './AdminBannersTab';
+import { AdminCustomSectionsTab } from './AdminCustomSectionsTab';
 import { AdminTrainingTab } from './AdminTrainingTab';
 import { AdminTendersTab } from './AdminTendersTab';
 import { AdminCampaignTab } from './AdminCampaignTab';
@@ -50,17 +56,21 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ onNavigate }) => {
     { id: 'dashboard', label: 'Dashboard Overview', icon: LayoutDashboard },
     { id: 'products', label: 'Products & Catalogue', icon: Package },
     { id: 'gallery', label: 'Craft Gallery (হাতের কাজ)', icon: Image },
+    { id: 'videos', label: 'Work & Craft Videos (কাজের ভিডিও)', icon: Video },
     { id: 'categories', label: 'Categories & Groups', icon: Layers },
     { id: 'leads', label: 'B2B Wholesale Leads', icon: Flame },
-    { id: 'artisans', label: 'Women Artisans', icon: Users },
+    { id: 'workers', label: 'Worker Applications (মহিলা আবেদন)', icon: Users },
+    { id: 'artisans', label: 'Women Artisans Network', icon: Users },
     { id: 'training', label: 'Training & Livelihood', icon: GraduationCap },
+    { id: 'banners', label: 'Banners & Countdown (অফার ব্যানার)', icon: Sparkles },
+    { id: 'sections', label: 'Custom Sections (কাস্টম সেকশন)', icon: Layers },
     { id: 'tenders', label: 'Govt. Tenders & RFP', icon: ShieldCheck },
     { id: 'testimonials', label: 'Client Reviews (গ্রাহক রিভিউ)', icon: Star },
     { id: 'campaign', label: 'Durga Puja Campaign', icon: Sparkles },
     { id: 'knowledge', label: 'AI Knowledge & FAQs', icon: Bot },
     { id: 'legal', label: 'Legal & Policies', icon: FileText },
     { id: 'media', label: 'Media & Asset Library', icon: Image },
-    { id: 'settings', label: 'Company Identity', icon: Settings }
+    { id: 'settings', label: 'Company Identity & Passwords', icon: Settings }
   ];
 
   const handleSelectTab = (tabId: string) => {
@@ -99,6 +109,11 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ onNavigate }) => {
         </div>
 
         <div className="flex items-center gap-3">
+          <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 text-[11px] font-semibold">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>সিস্টেম অনলাইন ও সুরক্ষিত (System Active)</span>
+          </div>
+
           <button
             type="button"
             onClick={() => handleSelectTab('guide')}
@@ -173,9 +188,13 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ onNavigate }) => {
           {activeTab === 'dashboard' && <AdminDashboardTab onSwitchTab={handleSelectTab} />}
           {activeTab === 'products' && <AdminProductsTab />}
           {activeTab === 'gallery' && <AdminGalleryTab />}
+          {activeTab === 'videos' && <AdminVideosTab />}
           {activeTab === 'categories' && <AdminCategoriesTab />}
           {activeTab === 'leads' && <AdminLeadsTab />}
+          {activeTab === 'workers' && <AdminWorkersTab />}
           {activeTab === 'artisans' && <AdminArtisansTab />}
+          {activeTab === 'banners' && <AdminBannersTab />}
+          {activeTab === 'sections' && <AdminCustomSectionsTab />}
           {activeTab === 'training' && <AdminTrainingTab />}
           {activeTab === 'tenders' && <AdminTendersTab />}
           {activeTab === 'testimonials' && <AdminTestimonialsTab />}

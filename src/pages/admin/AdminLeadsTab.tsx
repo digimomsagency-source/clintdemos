@@ -176,7 +176,7 @@ export const AdminLeadsTab: React.FC = () => {
           <input
             type="text"
             placeholder="Search leads..."
-            value={search}
+            value={search || ''}
             onChange={e => setSearch(e.target.value)}
             className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs outline-hidden focus:bg-white"
           />
@@ -186,7 +186,7 @@ export const AdminLeadsTab: React.FC = () => {
           <div className="flex items-center gap-1.5 text-xs">
             <span className="font-semibold text-slate-500">Status:</span>
             <select
-              value={statusFilter}
+              value={statusFilter || 'ALL'}
               onChange={e => setStatusFilter(e.target.value)}
               className="px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs"
             >
@@ -205,7 +205,7 @@ export const AdminLeadsTab: React.FC = () => {
           <div className="flex items-center gap-1.5 text-xs">
             <span className="font-semibold text-slate-500">Priority:</span>
             <select
-              value={priorityFilter}
+              value={priorityFilter || 'ALL'}
               onChange={e => setPriorityFilter(e.target.value)}
               className="px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs"
             >
@@ -270,7 +270,7 @@ export const AdminLeadsTab: React.FC = () => {
 
                   <td className="p-3.5">
                     <select
-                      value={lead.status}
+                      value={lead.status || 'NEW'}
                       onChange={e => handleUpdateStatus(lead.id, e.target.value as LeadStatus)}
                       className="text-[11px] font-semibold bg-slate-100 border border-slate-300 rounded px-2 py-1 outline-hidden"
                     >
@@ -448,7 +448,7 @@ export const AdminLeadsTab: React.FC = () => {
                   <input
                     type="text"
                     placeholder="Add follow-up notes, quoted rates, callback reminders..."
-                    value={newNote}
+                    value={newNote || ''}
                     onChange={e => setNewNote(e.target.value)}
                     className="flex-1 px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl text-xs outline-hidden"
                   />

@@ -219,7 +219,7 @@ export const BulkEnquiryModal: React.FC = () => {
                     type="text"
                     required
                     placeholder="e.g. Rajesh Sharma / Sarah Jenkins"
-                    value={formData.name}
+                    value={formData.name || ''}
                     onChange={e => setFormData({ ...formData, name: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-amber-500 outline-hidden"
                   />
@@ -231,7 +231,7 @@ export const BulkEnquiryModal: React.FC = () => {
                   <input
                     type="text"
                     placeholder="e.g. Heritage Crafts Boutique / Govt. Dept"
-                    value={formData.companyName}
+                    value={formData.companyName || ''}
                     onChange={e => setFormData({ ...formData, companyName: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-amber-500 outline-hidden"
                   />
@@ -248,7 +248,7 @@ export const BulkEnquiryModal: React.FC = () => {
                     type="tel"
                     required
                     placeholder="+91 98765 43210"
-                    value={formData.whatsapp}
+                    value={formData.whatsapp || ''}
                     onChange={e => setFormData({ ...formData, whatsapp: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-amber-500 outline-hidden"
                   />
@@ -260,7 +260,7 @@ export const BulkEnquiryModal: React.FC = () => {
                   <input
                     type="email"
                     placeholder="buyer@company.com"
-                    value={formData.email}
+                    value={formData.email || ''}
                     onChange={e => setFormData({ ...formData, email: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-amber-500 outline-hidden"
                   />
@@ -277,7 +277,7 @@ export const BulkEnquiryModal: React.FC = () => {
                     type="text"
                     required
                     placeholder="e.g. Terracotta Jewellery, Maa Durga Plaques, Dokra"
-                    value={formData.productOrCategory}
+                    value={formData.productOrCategory || ''}
                     onChange={e => setFormData({ ...formData, productOrCategory: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-amber-500 outline-hidden"
                   />
@@ -290,7 +290,7 @@ export const BulkEnquiryModal: React.FC = () => {
                     type="text"
                     required
                     placeholder="e.g. 100, 500 pcs"
-                    value={formData.quantity}
+                    value={formData.quantity || ''}
                     onChange={e => setFormData({ ...formData, quantity: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-amber-500 outline-hidden"
                   />
@@ -306,7 +306,7 @@ export const BulkEnquiryModal: React.FC = () => {
                   <input
                     type="text"
                     placeholder="e.g. India, United Kingdom, USA, UAE"
-                    value={formData.country}
+                    value={formData.country || ''}
                     onChange={e => setFormData({ ...formData, country: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-amber-500 outline-hidden"
                   />
@@ -317,7 +317,7 @@ export const BulkEnquiryModal: React.FC = () => {
                   </label>
                   <input
                     type="date"
-                    value={formData.requiredDeliveryDate}
+                    value={formData.requiredDeliveryDate || ''}
                     onChange={e => setFormData({ ...formData, requiredDeliveryDate: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-amber-500 outline-hidden"
                   />
@@ -342,7 +342,7 @@ export const BulkEnquiryModal: React.FC = () => {
                   <input
                     type="text"
                     placeholder="Specific customization requirements (colors, tags, size modifications)..."
-                    value={formData.customizationRequirement}
+                    value={formData.customizationRequirement || ''}
                     onChange={e => setFormData({ ...formData, customizationRequirement: e.target.value })}
                     className="w-full px-3 py-1.5 bg-white border border-amber-300 rounded-lg text-xs outline-hidden"
                   />
@@ -357,7 +357,7 @@ export const BulkEnquiryModal: React.FC = () => {
                 <textarea
                   rows={3}
                   placeholder="Share details regarding your target budget, packaging specifications, or event deadlines..."
-                  value={formData.message}
+                  value={formData.message || ''}
                   onChange={e => setFormData({ ...formData, message: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-lg focus:bg-white focus:ring-2 focus:ring-amber-500 outline-hidden"
                 />

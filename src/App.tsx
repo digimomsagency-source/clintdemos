@@ -118,7 +118,7 @@ function MainAppContent() {
       return <BulkOrdersPage />;
     }
 
-    if (route === '/artisans') {
+    if (route === '/artisans' || route === '/our-artisans') {
       return <ArtisansPage onNavigate={navigate} />;
     }
 

@@ -254,7 +254,7 @@ export const AdminDashboardTab: React.FC<AdminDashboardTabProps> = ({ onSwitchTa
 
                   <td className="p-3.5">
                     <select
-                      value={lead.status}
+                      value={lead.status || 'NEW'}
                       onChange={e => handleStatusChange(lead.id, e.target.value)}
                       className="text-[11px] font-semibold bg-slate-100 border border-slate-300 rounded px-2 py-1 outline-hidden"
                     >

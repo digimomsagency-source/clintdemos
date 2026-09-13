@@ -6,24 +6,18 @@ import {
   Sparkles, 
   Phone, 
   MessageCircle, 
-  ChevronRight, 
-  AlertCircle, 
-  Flame, 
   Shield, 
-  ExternalLink,
   Package,
-  Layers,
   ArrowRight
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
-import { api } from '../services/api';
 import { ChatMessage, LeadPriority } from '../types';
 
 interface AIChatbotProps {
   onNavigate: (route: string) => void;
 }
 
-export const AIChatbot: React.FC<AIChatbotProps> = ({ onNavigate }) => {
+export const AIChatbot: React.FC<AIChatbotProps> = () => {
   const { 
     settings, 
     chatOpen, 
@@ -31,37 +25,69 @@ export const AIChatbot: React.FC<AIChatbotProps> = ({ onNavigate }) => {
     chatPrefill, 
     currentLanguage, 
     setLanguage, 
-    openBulkModal 
+    openBulkModal,
+    dict
   } = useApp();
 
-  const [messages, setMessages] = useState<ChatMessage[]>([
-    {
-      id: 'welcome-1',
-      sender: 'bot',
-      text: "Hello! I am Jit Prime Assistant for JIT PRIME MPC COMPANY. I can help you with handcrafted Hasta Shilpa products, terracotta jewellery, bulk pricing, MOQ, Puja collections, and government tender supplies. How may I assist you today?",
-      language: 'en',
-      quickActions: [
-        'Show Products',
-        'I Need a Bulk Order',
-        'Handmade Jewellery',
-        'Hasta Shilpa & Clay Art',
-        'Talk to Monojit',
-        'How Women Can Join'
-      ],
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+  const getInitialMessage = (lang: 'en' | 'bn' | 'hi'): ChatMessage => {
+    switch (lang) {
+      case 'bn':
+        return {
+          id: 'welcome-bn',
+          sender: 'bot',
+          text: `নমস্কার! আমি জিত প্রাইম সহকারী। জিত প্রাইম এমপিসি কোম্পানির হস্তনির্মিত মাটির গয়না, টেরাকোটা ডেকোরেশন, পাইকারি রেট, পূজা কালেকশন এবং সরকারি টেন্ডার সরবরাহ সম্পর্কে আমি আপনাকে সাহায্য করতে পারি। আজ আপনাকে কীভাবে সাহায্য করতে পারি?`,
+          language: 'bn',
+          quickActions: [
+            'পণ্য ক্যাটালগ দেখুন',
+            'বাল্ক অর্ডারের কোটেশন চাই',
+            'মাটির গহনা কালেকশন',
+            'মহিলারা কীভাবে যুক্ত হবেন',
+            'মনোজিত দে-র সাথে কথা বলুন'
+          ],
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+      case 'hi':
+        return {
+          id: 'welcome-hi',
+          sender: 'bot',
+          text: `नमस्ते! मैं जीत प्राइम सहायक हूँ। जीत प्राइम एमपीसी कंपनी के हस्तनिर्मित मिट्टी के आभूषण, टेराकोटा कला, थोक दरें, पूजा संग्रह और सरकारी टेंडर आपूर्ति के संबंध में मैं आपकी सहायता कर सकता हूँ। आज मैं आपकी क्या मदद कर सकता हूँ?`,
+          language: 'hi',
+          quickActions: [
+            'उत्पाद कैटलॉग देखें',
+            'थोक ऑर्डर कोटेशन चाहिए',
+            'मिट्टी के आभूषण',
+            'महिलाएं कैसे जुड़ सकती हैं',
+            'मनोजित डे से बात करें'
+          ],
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
+      case 'en':
+      default:
+        return {
+          id: 'welcome-en',
+          sender: 'bot',
+          text: `Hello! I am Jit Prime Assistant for JIT PRIME MPC COMPANY. I can help you with handcrafted Hasta Shilpa products, terracotta jewellery, wholesale pricing, MOQ, Puja collections, and government tender supplies. How may I assist you today?`,
+          language: 'en',
+          quickActions: [
+            'Show Products',
+            'I Need a Bulk Order',
+            'Terracotta Jewellery',
+            'How Women Can Join',
+            'Talk to Monojit Dey'
+          ],
+          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+        };
     }
-  ]);
+  };
 
+  const [messages, setMessages] = useState<ChatMessage[]>([getInitialMessage(currentLanguage)]);
   const [inputText, setInputText] = useState('');
   const [loading, setLoading] = useState(false);
   const [activeIntent, setActiveIntent] = useState<LeadPriority>('LOW');
-  const [showLeadPrompt, setShowLeadPrompt] = useState(false);
-  const [leadForm, setLeadForm] = useState({ whatsapp: '', company: '', requirement: '' });
-  const [leadSubmitted, setLeadSubmitted] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const phone = settings?.whatsappNumber || '+91 82405 85219';
+  const primaryPhone = settings?.phone || '+91 82405 85219';
+  const ownerName = settings?.ownerName || 'Monojit Dey';
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -72,6 +98,13 @@ export const AIChatbot: React.FC<AIChatbotProps> = ({ onNavigate }) => {
       scrollToBottom();
     }
   }, [messages, chatOpen, loading]);
+
+  // When language changes, update welcome message if user hasn't started typing
+  useEffect(() => {
+    if (messages.length === 1 && messages[0].sender === 'bot') {
+      setMessages([getInitialMessage(currentLanguage)]);
+    }
+  }, [currentLanguage]);
 
   // Handle external prefill from context
   useEffect(() => {
@@ -98,105 +131,76 @@ export const AIChatbot: React.FC<AIChatbotProps> = ({ onNavigate }) => {
 
     try {
       const history = messages.map(m => ({ sender: m.sender, text: m.text }));
-      const response = await api.sendChatMessage(text, currentLanguage, history);
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          message: text,
+          language: currentLanguage,
+          history
+        })
+      });
 
-      if (response.language && response.language !== currentLanguage) {
-        setLanguage(response.language);
+      if (!response.ok) {
+        throw new Error('Chat service error');
       }
 
-      if (response.intentScore === 'VERY HIGH') {
-        setActiveIntent('VERY HIGH');
-      }
+      const data = await response.json();
 
       const botMsg: ChatMessage = {
         id: `bot-${Date.now()}`,
         sender: 'bot',
-        text: response.text,
-        language: response.language || currentLanguage,
-        intentScore: response.intentScore as LeadPriority,
-        products: response.matchedProducts,
-        quickActions: response.quickActions,
+        text: data.reply || (currentLanguage === 'bn' ? 'ধন্যবাদ। আপনার বার্তার জন্য মনোজিত দে বা আমাদের কর্মশালার দল শীঘ্রই আপনার সাথে যোগাযোগ করবে।' : currentLanguage === 'hi' ? 'धन्यवाद। आपकी पूछताछ के लिए हमारी टीम जल्द ही आपसे संपर्क करेगी।' : 'Thank you. For customized bulk orders, please feel free to request a quotation or contact Monojit Dey directly.'),
+        products: data.products || [],
+        intentScore: data.intentScore || 'MEDIUM',
+        quickActions: data.quickActions || (currentLanguage === 'bn' ? ['বাল্ক কোটেশন চান?', 'অন্যান্য পণ্য দেখুন'] : currentLanguage === 'hi' ? ['थोक कोटेशन चाहिए?', 'अन्य उत्पाद देखें'] : ['Request Bulk Quote', 'View Products']),
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
+
+      if (data.intentScore === 'VERY HIGH') {
+        setActiveIntent('VERY HIGH');
+      }
 
       setMessages(prev => [...prev, botMsg]);
     } catch (err) {
       console.error('Chat error:', err);
-      const errorMsg: ChatMessage = {
+      // Fallback response
+      const fallbackText = currentLanguage === 'bn'
+        ? `ধন্যবাদ! আপনি সরাসরি মনোজিত দে-র সাথে হোয়াটসঅ্যাপে (+91 82405 85219) কথা বলতে পারেন অথবা ওয়েবসাইটে 'বাল্ক কোটেশন' ফর্মটি পূরণ করতে পারেন।`
+        : currentLanguage === 'hi'
+        ? `धन्यवाद! आप सीधे मनोजित डे से व्हाट्सएप पर (+91 82405 85219) संपर्क कर सकते हैं या थोक कोटेशन का अनुरोध कर सकते हैं।`
+        : `Thank you! You can directly reach Monojit Dey on WhatsApp at +91 82405 85219 or submit a Bulk Quote Request right on this page.`;
+
+      const botMsg: ChatMessage = {
         id: `bot-err-${Date.now()}`,
         sender: 'bot',
-        text: "I'm having a brief connection issue, but you can directly contact owner Monojit Dey on WhatsApp (+91 82405 85219) for immediate assistance.",
-        language: currentLanguage,
+        text: fallbackText,
         timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
       };
-      setMessages(prev => [...prev, errorMsg]);
+      setMessages(prev => [...prev, botMsg]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleLeadSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!leadForm.whatsapp) return;
-
-    try {
-      await api.submitLead({
-        name: 'Chat Customer',
-        companyName: leadForm.company || 'Direct Buyer',
-        country: 'India',
-        whatsapp: leadForm.whatsapp,
-        email: '',
-        productOrCategory: 'Inquired in Chat Assistant',
-        quantity: activeIntent === 'VERY HIGH' ? 'High Volume' : '100+',
-        message: leadForm.requirement || 'Interested in bulk quotation from Jit Prime MPC Company',
-        source: 'AI Chatbot',
-        priority: activeIntent
-      });
-      setLeadSubmitted(true);
-      setShowLeadPrompt(false);
-
-      setMessages(prev => [
-        ...prev,
-        {
-          id: `bot-lead-confirm-${Date.now()}`,
-          sender: 'bot',
-          text: `Thank you! Your details have been received. Mr. Monojit Dey and our production team will connect with you via WhatsApp (${leadForm.whatsapp}) shortly.`,
-          timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-        }
-      ]);
-    } catch (err) {
-      console.error('Lead submit error:', err);
-    }
-  };
-
   return (
     <>
-      {/* Trigger Button when closed */}
+      {/* Floating Trigger Button */}
       {!chatOpen && (
-        <div className="fixed bottom-6 right-6 z-40">
-          <button
-            type="button"
-            onClick={() => setChatOpen(true)}
-            className="group flex items-center gap-3 bg-linear-to-r from-[#0B1A30] to-[#152E54] hover:from-[#152E54] hover:to-[#0B1A30] text-white pl-4 pr-5 py-3 rounded-full shadow-xl hover:shadow-2xl border-2 border-amber-400 transition-all duration-300 transform hover:-translate-y-1 cursor-pointer"
-            aria-label="Open Jit Prime Assistant"
-          >
-            <div className="relative">
-              <div className="w-8 h-8 rounded-full bg-amber-400 flex items-center justify-center text-slate-950">
-                <Bot className="w-5 h-5" />
-              </div>
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-400 rounded-full animate-ping"></span>
-              <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-400 rounded-full"></span>
-            </div>
-            <div className="text-left">
-              <span className="block text-[11px] font-bold text-amber-400 uppercase tracking-wider leading-none">
-                Jit Prime Assistant
-              </span>
-              <span className="block text-xs font-semibold text-slate-200">
-                Craft, Product & Bulk Sales
-              </span>
-            </div>
-          </button>
-        </div>
+        <button
+          type="button"
+          onClick={() => setChatOpen(true)}
+          className="fixed bottom-6 right-6 z-40 px-4 py-3.5 bg-linear-to-r from-[#0B1A30] to-[#142C4F] text-white rounded-full shadow-2xl hover:shadow-amber-500/20 hover:scale-105 transition-all flex items-center gap-2.5 border-2 border-amber-400 group cursor-pointer"
+          aria-label="Open AI Assistant"
+        >
+          <div className="relative">
+            <Bot className="w-6 h-6 text-amber-400 group-hover:rotate-12 transition-transform" />
+            <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-[#0B1A30] animate-pulse"></span>
+          </div>
+          <span className="font-extrabold text-xs sm:text-sm text-amber-300">
+            {dict.chatbot_title}
+          </span>
+        </button>
       )}
 
       {/* Main Chat Window */}
@@ -211,17 +215,17 @@ export const AIChatbot: React.FC<AIChatbotProps> = ({ onNavigate }) => {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="font-extrabold text-sm sm:text-base text-white">
-                    Jit Prime Assistant
+                  <h3 className="font-extrabold text-sm sm:text-base text-white font-serif-heading">
+                    {dict.chatbot_title}
                   </h3>
                   {activeIntent === 'VERY HIGH' && (
                     <span className="text-[10px] bg-red-600 text-white font-bold px-1.5 py-0.5 rounded">
-                      Priority Intent
+                      Priority
                     </span>
                   )}
                 </div>
                 <p className="text-[11px] text-amber-300">
-                  Craft, Product & Bulk Order Assistant
+                  {currentLanguage === 'bn' ? 'হস্তশিল্প ও বাল্ক অর্ডার সহায়িকা' : currentLanguage === 'hi' ? 'हस्तशिल्प व थोक ऑर्डर सहायक' : 'Craft, Product & Bulk Assistant'}
                 </p>
               </div>
             </div>
@@ -232,21 +236,21 @@ export const AIChatbot: React.FC<AIChatbotProps> = ({ onNavigate }) => {
                 <button
                   type="button"
                   onClick={() => setLanguage('en')}
-                  className={`px-1.5 py-0.5 rounded ${currentLanguage === 'en' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400'}`}
+                  className={`px-1.5 py-0.5 rounded cursor-pointer ${currentLanguage === 'en' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400'}`}
                 >
                   EN
                 </button>
                 <button
                   type="button"
                   onClick={() => setLanguage('bn')}
-                  className={`px-1.5 py-0.5 rounded ${currentLanguage === 'bn' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400'}`}
+                  className={`px-1.5 py-0.5 rounded cursor-pointer ${currentLanguage === 'bn' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400'}`}
                 >
                   বাংলা
                 </button>
                 <button
                   type="button"
                   onClick={() => setLanguage('hi')}
-                  className={`px-1.5 py-0.5 rounded ${currentLanguage === 'hi' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400'}`}
+                  className={`px-1.5 py-0.5 rounded cursor-pointer ${currentLanguage === 'hi' ? 'bg-amber-400 text-slate-950 font-bold' : 'text-slate-400'}`}
                 >
                   हिन्दी
                 </button>
@@ -255,7 +259,7 @@ export const AIChatbot: React.FC<AIChatbotProps> = ({ onNavigate }) => {
               <button
                 type="button"
                 onClick={() => setChatOpen(false)}
-                className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
+                className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
                 aria-label="Close chat"
               >
                 <X className="w-5 h-5" />
@@ -267,21 +271,21 @@ export const AIChatbot: React.FC<AIChatbotProps> = ({ onNavigate }) => {
           <div className="bg-[#FAF5E9] border-b border-amber-200/80 px-3 py-1.5 flex items-center justify-between text-xs text-slate-700 shrink-0">
             <span className="font-semibold text-amber-900 flex items-center gap-1">
               <Shield className="w-3.5 h-3.5 text-amber-700" />
-              Direct Support:
+              {dict.direct_call}:
             </span>
             <div className="flex items-center gap-2">
               <a
-                href={`https://wa.me/${phone.replace(/[^0-9]/g, '')}`}
+                href={`https://wa.me/${primaryPhone.replace(/[^0-9]/g, '')}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-700 hover:underline"
               >
                 <MessageCircle className="w-3 h-3" />
-                <span>WhatsApp Monojit</span>
+                <span>WhatsApp {ownerName}</span>
               </a>
               <span>&bull;</span>
               <a
-                href={`tel:${phone.replace(/\s+/g, '')}`}
+                href={`tel:${primaryPhone.replace(/\s+/g, '')}`}
                 className="inline-flex items-center gap-1 text-[11px] font-bold text-slate-800 hover:underline"
               >
                 <Phone className="w-3 h-3 text-amber-600" />
@@ -311,7 +315,7 @@ export const AIChatbot: React.FC<AIChatbotProps> = ({ onNavigate }) => {
                     <div className="mt-3 space-y-2 border-t border-slate-100 pt-2.5">
                       <p className="text-[11px] font-bold text-amber-800 uppercase tracking-wider flex items-center gap-1">
                         <Package className="w-3 h-3" />
-                        Relevant Products from Database:
+                        {currentLanguage === 'bn' ? 'প্রাসঙ্গিক হস্তশিল্প পণ্য:' : currentLanguage === 'hi' ? 'प्रासंगिक हस्तशिल्प उत्पाद:' : 'Relevant Products from Catalogue:'}
                       </p>
                       <div className="grid grid-cols-1 gap-2">
                         {msg.products.map(p => (
@@ -345,7 +349,7 @@ export const AIChatbot: React.FC<AIChatbotProps> = ({ onNavigate }) => {
                                 setChatOpen(false);
                                 openBulkModal(p as any);
                               }}
-                              className="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-[11px] rounded shrink-0 shadow-xs"
+                              className="px-2.5 py-1 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-[11px] rounded shrink-0 shadow-xs cursor-pointer"
                             >
                               Quote
                             </button>
@@ -355,12 +359,18 @@ export const AIChatbot: React.FC<AIChatbotProps> = ({ onNavigate }) => {
                     </div>
                   )}
 
-                  {/* High-Intent Natural Action Suggestion (Only on explicit quote / bulk intent) */}
-                  {msg.sender === 'bot' && (msg.intentScore === 'VERY HIGH' || msg.text.toLowerCase().includes('quotation') || msg.text.toLowerCase().includes('quote')) && (
+                  {/* High-Intent Natural Action Suggestion */}
+                  {msg.sender === 'bot' && (msg.intentScore === 'VERY HIGH' || msg.text.toLowerCase().includes('quotation') || msg.text.toLowerCase().includes('কোটেশন')) && (
                     <div className="mt-3 p-2.5 bg-amber-50/90 border border-amber-300 rounded-xl space-y-2">
                       <div className="flex items-center gap-1.5 text-[11px] font-bold text-amber-950">
                         <Sparkles className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-                        <span>Would you like to request a customized bulk quotation?</span>
+                        <span>
+                          {currentLanguage === 'bn' 
+                            ? 'আপনি কি একটি কাস্টমাইজড বাল্ক কোটেশন পেতে চান?' 
+                            : currentLanguage === 'hi'
+                            ? 'क्या आप थोक कोटेशन का अनुरोध करना चाहते हैं?'
+                            : 'Would you like to request a customized bulk quotation?'}
+                        </span>
                       </div>
                       <div className="flex flex-wrap items-center gap-2 pt-0.5">
                         <button
@@ -371,17 +381,17 @@ export const AIChatbot: React.FC<AIChatbotProps> = ({ onNavigate }) => {
                           }}
                           className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold text-[11px] rounded-lg shadow-xs transition-colors flex items-center gap-1 cursor-pointer"
                         >
-                          <span>Request Bulk Quote</span>
+                          <span>{dict.nav_get_quote}</span>
                           <ArrowRight className="w-3 h-3" />
                         </button>
                         <a
-                          href={`https://wa.me/${phone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent('Hello Monojit Dey, I would like to inquire about a bulk quotation for handcrafted products.')}`}
+                          href={`https://wa.me/${primaryPhone.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(`Hello ${ownerName}, I would like to inquire about a bulk quotation for handcrafted products.`)}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] rounded-lg shadow-xs transition-colors flex items-center gap-1"
                         >
                           <MessageCircle className="w-3 h-3" />
-                          <span>WhatsApp Monojit</span>
+                          <span>WhatsApp {ownerName}</span>
                         </a>
                       </div>
                     </div>
@@ -390,7 +400,9 @@ export const AIChatbot: React.FC<AIChatbotProps> = ({ onNavigate }) => {
                   {/* Render Quick Actions suggestions inside message */}
                   {msg.quickActions && msg.quickActions.length > 0 && (
                     <div className="mt-3 space-y-1.5 border-t border-slate-100 pt-2">
-                      <span className="text-[10px] text-slate-400 font-semibold block">Suggested Questions (or type any question below):</span>
+                      <span className="text-[10px] text-slate-400 font-semibold block">
+                        {currentLanguage === 'bn' ? 'প্রস্তাবিত বিষয়সমূহ:' : currentLanguage === 'hi' ? 'सुझाए गए विषय:' : 'Suggested Questions:'}
+                      </span>
                       <div className="flex flex-wrap gap-1.5">
                         {msg.quickActions.map((action, idx) => (
                           <button
@@ -416,7 +428,13 @@ export const AIChatbot: React.FC<AIChatbotProps> = ({ onNavigate }) => {
             {loading && (
               <div className="flex items-center gap-2 text-slate-500 text-xs py-2 bg-white px-3 rounded-lg border border-slate-200 w-fit shadow-xs">
                 <Sparkles className="w-3.5 h-3.5 text-amber-500 animate-spin" />
-                <span>Checking catalogue and product database...</span>
+                <span>
+                  {currentLanguage === 'bn' 
+                    ? 'ক্যাটালগ এবং তথ্য পরীক্ষা করা হচ্ছে...' 
+                    : currentLanguage === 'hi'
+                    ? 'कैटलॉग और जानकारी जांची जा रही है...'
+                    : 'Checking catalogue and product database...'}
+                </span>
               </div>
             )}
 
@@ -441,7 +459,7 @@ export const AIChatbot: React.FC<AIChatbotProps> = ({ onNavigate }) => {
                     ? "अपना प्रश्न यहाँ लिखें..."
                     : "Ask about jewellery, bulk orders, prices..."
                 }
-                value={inputText}
+                value={inputText || ''}
                 onChange={(e) => setInputText(e.target.value)}
                 disabled={loading}
                 className="flex-1 px-3.5 py-2.5 text-xs sm:text-sm bg-slate-50 border border-slate-300 rounded-xl focus:outline-hidden focus:ring-2 focus:ring-amber-400 focus:bg-white transition-all disabled:opacity-50"
@@ -456,7 +474,7 @@ export const AIChatbot: React.FC<AIChatbotProps> = ({ onNavigate }) => {
               </button>
             </form>
             <div className="flex items-center justify-between text-[10px] text-slate-400 mt-1.5 px-1">
-              <span>Auto-detects English, বাংলা, हिन्दी</span>
+              <span>English &bull; বাংলা &bull; हिन्दी</span>
               <span>All Govt. Tender &bull; Hasta Shilpa</span>
             </div>
           </div>

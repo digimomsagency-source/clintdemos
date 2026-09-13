@@ -169,7 +169,7 @@ export const AdminBengaliGuideTab: React.FC<AdminBengaliGuideTabProps> = ({ onSw
         <Search className="w-4 h-4 text-slate-400 shrink-0" />
         <input
           type="text"
-          value={searchQuery}
+          value={searchQuery || ''}
           onChange={(e) => setSearchQuery(e.target.value)}
           placeholder="কোন বিষয়ে জানতে চান খুঁজুন (যেমন: ছবি আপলোড, দাম, লিডস, ট্রেনিং)..."
           className="w-full bg-transparent border-none text-xs text-slate-900 focus:outline-hidden"

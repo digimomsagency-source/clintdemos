@@ -9,8 +9,8 @@ interface AdminLoginProps {
 
 export const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess, onCancel }) => {
   const { login, settings } = useApp();
-  const [username, setUsername] = useState('admin');
-  const [password, setPassword] = useState('admin123');
+  const [username, setUsername] = useState('admin@gmail.com');
+  const [password, setPassword] = useState('Jit@123');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -47,7 +47,8 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess, onCancel }) =
 
     // Static / Offline Fallback Authentication
     const validUsers = [
-      { username: 'admin', email: 'admin@jitprime.com', pass: 'admin123', name: 'Monojit Dey', role: 'superadmin' },
+      { username: 'admin', email: 'admin@gmail.com', pass: 'Jit@123', name: 'Admin', role: 'superadmin' },
+      { username: 'admin', email: 'admin@jitprime.com', pass: 'admin123', name: 'Admin', role: 'superadmin' },
       { username: 'monojit', email: 'monojitdey189@gmail.com', pass: 'jitprime85219', name: 'Monojit Dey', role: 'superadmin' }
     ];
 
@@ -66,7 +67,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess, onCancel }) =
       });
       onSuccess();
     } else {
-      setError('Invalid username/email or password. (Default: admin / admin123)');
+      setError('Invalid username/email or password. (Credentials: admin@gmail.com / Jit@123)');
     }
     setLoading(false);
   };
@@ -109,7 +110,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess, onCancel }) =
                 type="text"
                 required
                 placeholder="admin or monojitdey189@gmail.com"
-                value={username}
+                value={username || ''}
                 onChange={e => setUsername(e.target.value)}
                 className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500 outline-hidden"
               />
@@ -122,7 +123,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess, onCancel }) =
               <input
                 type="password"
                 required
-                value={password}
+                value={password || ''}
                 onChange={e => setPassword(e.target.value)}
                 className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500 outline-hidden"
               />
@@ -162,17 +163,17 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess, onCancel }) =
                 type="button"
                 disabled={loading}
                 onClick={() => {
-                  setUsername('admin');
-                  setPassword('admin123');
-                  handleLoginWithCreds('admin', 'admin123');
+                  setUsername('admin@gmail.com');
+                  setPassword('Jit@123');
+                  handleLoginWithCreds('admin@gmail.com', 'Jit@123');
                 }}
                 className="w-full text-left p-2 rounded-xl bg-white border border-amber-300 hover:border-amber-500 hover:bg-amber-100/50 transition-all shadow-xs cursor-pointer disabled:opacity-50"
               >
                 <p className="font-bold text-slate-900 text-xs flex items-center justify-between">
-                  <span>Sign In as Admin</span>
+                  <span>Sign In (Admin Setup)</span>
                   <ArrowRight className="w-3 h-3 text-amber-600" />
                 </p>
-                <p className="text-[10px] text-slate-500 font-mono mt-0.5">admin / admin123</p>
+                <p className="text-[10px] text-slate-500 font-mono mt-0.5">admin@gmail.com / Jit@123</p>
               </button>
 
               <button

@@ -106,7 +106,7 @@ export const AdminCampaignTab: React.FC = () => {
             <input
               type="text"
               required
-              value={campaign.title}
+              value={campaign.title || ''}
               onChange={e => setCampaign({ ...campaign, title: e.target.value })}
               className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
             />
@@ -116,7 +116,7 @@ export const AdminCampaignTab: React.FC = () => {
             <label className="block font-bold text-slate-700 mb-1">Subtitle / Sub-hook</label>
             <input
               type="text"
-              value={campaign.subtitle}
+              value={campaign.subtitle || ''}
               onChange={e => setCampaign({ ...campaign, subtitle: e.target.value })}
               className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
             />
@@ -141,7 +141,7 @@ export const AdminCampaignTab: React.FC = () => {
             <label className="block font-bold text-slate-700 mb-1">Offer / Discount Badge Text</label>
             <input
               type="text"
-              value={campaign.offerText}
+              value={campaign.offerText || ''}
               onChange={e => setCampaign({ ...campaign, offerText: e.target.value })}
               className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
             />
@@ -153,7 +153,7 @@ export const AdminCampaignTab: React.FC = () => {
           <label className="block font-bold text-slate-700 mb-1">Full Campaign Description</label>
           <textarea
             rows={3}
-            value={campaign.description}
+            value={campaign.description || ''}
             onChange={e => setCampaign({ ...campaign, description: e.target.value })}
             className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
           />
@@ -164,7 +164,7 @@ export const AdminCampaignTab: React.FC = () => {
             <label className="block font-bold text-slate-700 mb-1">CTA Button Label</label>
             <input
               type="text"
-              value={campaign.ctaText}
+              value={campaign.ctaText || ''}
               onChange={e => setCampaign({ ...campaign, ctaText: e.target.value })}
               className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
             />
@@ -173,7 +173,7 @@ export const AdminCampaignTab: React.FC = () => {
             <label className="block font-bold text-slate-700 mb-1">CTA Destination Route</label>
             <input
               type="text"
-              value={campaign.ctaLink}
+              value={campaign.ctaLink || ''}
               onChange={e => setCampaign({ ...campaign, ctaLink: e.target.value })}
               className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
             />

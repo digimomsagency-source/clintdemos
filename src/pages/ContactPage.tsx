@@ -148,9 +148,14 @@ export const ContactPage: React.FC = () => {
               <div className="flex items-center gap-3">
                 <Clock className="w-5 h-5 text-amber-600 shrink-0" />
                 <div>
-                  <h4 className="font-bold text-slate-900">Business Hours</h4>
+                  <div className="flex items-center gap-2">
+                    <h4 className="font-bold text-slate-900">Business Hours</h4>
+                    <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800">
+                      Open 24/7
+                    </span>
+                  </div>
                   <p className="text-xs text-slate-600">
-                    Monday &ndash; Saturday: 9:30 AM &ndash; 7:30 PM (IST)
+                    {settings?.businessHours || '24/7 (Open 24 Hours, 7 Days a Week)'}
                   </p>
                 </div>
               </div>
@@ -219,7 +224,7 @@ export const ContactPage: React.FC = () => {
                     type="text"
                     required
                     placeholder="e.g. Amitava Banerjee"
-                    value={form.name}
+                    value={form.name || ''}
                     onChange={e => setForm({ ...form, name: e.target.value })}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500 outline-hidden"
                   />
@@ -232,7 +237,7 @@ export const ContactPage: React.FC = () => {
                     type="tel"
                     required
                     placeholder="+91 98765 43210"
-                    value={form.phone}
+                    value={form.phone || ''}
                     onChange={e => setForm({ ...form, phone: e.target.value })}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500 outline-hidden"
                   />
@@ -247,7 +252,7 @@ export const ContactPage: React.FC = () => {
                   <input
                     type="email"
                     placeholder="yourname@gmail.com"
-                    value={form.email}
+                    value={form.email || ''}
                     onChange={e => setForm({ ...form, email: e.target.value })}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500 outline-hidden"
                   />
@@ -259,7 +264,7 @@ export const ContactPage: React.FC = () => {
                   <input
                     type="text"
                     placeholder="Organization Name"
-                    value={form.company}
+                    value={form.company || ''}
                     onChange={e => setForm({ ...form, company: e.target.value })}
                     className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500 outline-hidden"
                   />
@@ -274,7 +279,7 @@ export const ContactPage: React.FC = () => {
                   rows={4}
                   required
                   placeholder="How can we assist you with handcrafted products, tender requirements, or training..."
-                  value={form.message}
+                  value={form.message || ''}
                   onChange={e => setForm({ ...form, message: e.target.value })}
                   className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500 outline-hidden"
                 />

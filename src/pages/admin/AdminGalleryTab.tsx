@@ -92,11 +92,11 @@ export const AdminGalleryTab: React.FC = () => {
     const isPredefined = PREDEFINED_CATEGORIES.includes(item.category);
     setCustomCategoryMode(!isPredefined);
     setFormData({
-      title: item.title,
+      title: item.title || '',
       category: isPredefined ? item.category : PREDEFINED_CATEGORIES[0],
-      customCategory: !isPredefined ? item.category : '',
-      description: item.description,
-      imageUrl: item.imageUrl,
+      customCategory: !isPredefined ? (item.category || '') : '',
+      description: item.description || '',
+      imageUrl: item.imageUrl || '',
       artisanName: item.artisanName || '',
       materials: item.materials || '',
       featured: !!item.featured
@@ -258,7 +258,7 @@ export const AdminGalleryTab: React.FC = () => {
           <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
           <input
             type="text"
-            value={searchQuery}
+            value={searchQuery || ''}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="নাম বা কারিগর দিয়ে খুঁজুন..."
             className="w-full pl-9 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 focus:outline-hidden focus:ring-1 focus:ring-slate-900"
@@ -404,7 +404,7 @@ export const AdminGalleryTab: React.FC = () => {
 
                 <input
                   type="text"
-                  value={formData.imageUrl}
+                  value={formData.imageUrl || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, imageUrl: e.target.value }))}
                   placeholder="https://... অথবা ডিভাইস থেকে আপলোডকৃত লিংক"
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 focus:outline-hidden focus:ring-1 focus:ring-slate-900"
@@ -427,7 +427,7 @@ export const AdminGalleryTab: React.FC = () => {
                 </label>
                 <input
                   type="text"
-                  value={formData.title}
+                  value={formData.title || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
                   placeholder="যেমন: হ্যান্ডপেইন্টেড টেরাকোটা নেকলেস সেট"
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 focus:outline-hidden focus:ring-1 focus:ring-slate-900"
@@ -452,7 +452,7 @@ export const AdminGalleryTab: React.FC = () => {
 
                 {!customCategoryMode ? (
                   <select
-                    value={formData.category}
+                    value={formData.category || PREDEFINED_CATEGORIES[0]}
                     onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 focus:outline-hidden focus:ring-1 focus:ring-slate-900"
                   >
@@ -463,7 +463,7 @@ export const AdminGalleryTab: React.FC = () => {
                 ) : (
                   <input
                     type="text"
-                    value={formData.customCategory}
+                    value={formData.customCategory || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, customCategory: e.target.value }))}
                     placeholder="নতুন ক্যাটাগরির নাম লিখুন (যেমন: Cane & Bamboo)"
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 focus:outline-hidden focus:ring-1 focus:ring-slate-900"
@@ -479,7 +479,7 @@ export const AdminGalleryTab: React.FC = () => {
                   </label>
                   <input
                     type="text"
-                    value={formData.artisanName}
+                    value={formData.artisanName || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, artisanName: e.target.value }))}
                     placeholder="যেমন: Kakali Mondal"
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 focus:outline-hidden focus:ring-1 focus:ring-slate-900"
@@ -492,7 +492,7 @@ export const AdminGalleryTab: React.FC = () => {
                   </label>
                   <input
                     type="text"
-                    value={formData.materials}
+                    value={formData.materials || ''}
                     onChange={(e) => setFormData(prev => ({ ...prev, materials: e.target.value }))}
                     placeholder="যেমন: Terracotta Clay, Brass"
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 focus:outline-hidden focus:ring-1 focus:ring-slate-900"
@@ -507,7 +507,7 @@ export const AdminGalleryTab: React.FC = () => {
                 </label>
                 <textarea
                   rows={3}
-                  value={formData.description}
+                  value={formData.description || ''}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
                   placeholder="কাজের বৈশিষ্ট্য, ঐতিহ্য ও কারুকার্যের বর্ণনা..."
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-900 focus:outline-hidden focus:ring-1 focus:ring-slate-900"

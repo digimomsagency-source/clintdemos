@@ -20,7 +20,11 @@ import {
   FAQ,
   Testimonial,
   NavigationItem,
-  GalleryItem
+  GalleryItem,
+  VideoItem,
+  BannerItem,
+  CustomSection,
+  WorkerApplication
 } from './src/types.js';
 
 dotenv.config();
@@ -55,17 +59,20 @@ const storage = multer.diskStorage({
 });
 
 const fileFilter = (req: any, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
-  const allowedMime = ['image/jpeg', 'image/png', 'image/webp', 'image/jpg', 'image/gif', 'application/pdf'];
+  const allowedMime = [
+    'image/jpeg', 'image/png', 'image/webp', 'image/jpg', 'image/gif', 'application/pdf',
+    'video/mp4', 'video/webm', 'video/ogg', 'video/quicktime', 'video/x-msvideo', 'video/mpeg'
+  ];
   if (allowedMime.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('Only JPG, PNG, WEBP, and PDF documents are allowed'));
+    cb(new Error('Only JPG, PNG, WEBP, GIF, PDF, and video formats (MP4, WebM, QuickTime) are allowed'));
   }
 };
 
 const upload = multer({
   storage,
-  limits: { fileSize: 15 * 1024 * 1024 }, // 15MB limit
+  limits: { fileSize: 100 * 1024 * 1024 }, // 100MB limit for high-res images and workshop videos
   fileFilter
 });
 
@@ -146,13 +153,18 @@ app.get('/api/auth/verify', (req, res) => {
 
 app.post('/api/auth/change-password', checkAuth, (req, res) => {
   const { oldPassword, newPassword } = req.body;
-  const db = readDb();
-  const admin = db.adminUsers[0];
-  if (admin.passwordHash !== oldPassword) {
-    return res.status(400).json({ error: 'Current password is incorrect' });
+  if (!newPassword || typeof newPassword !== 'string' || newPassword.length < 4) {
+    return res.status(400).json({ error: 'New password must be at least 4 characters' });
   }
-  admin.passwordHash = newPassword;
-  writeDb(db);
+  const db = readDb();
+  if (db.adminUsers && db.adminUsers.length > 0) {
+    const admin = db.adminUsers[0];
+    if (oldPassword && admin.passwordHash !== oldPassword) {
+      return res.status(400).json({ error: 'Current password is incorrect' });
+    }
+    admin.passwordHash = newPassword;
+    writeDb(db);
+  }
   res.json({ success: true, message: 'Password updated successfully' });
 });
 
@@ -819,6 +831,190 @@ app.post('/api/upload-multiple', upload.array('files', 12), (req, res) => {
     files: uploadedMedia,
     urls: uploadedMedia.map(m => m.url)
   });
+});
+
+// Videos (Google Drive link and video embeds)
+app.get('/api/videos', (req, res) => {
+  const db = readDb();
+  let list = db.videos || [];
+  if (req.query.includeHidden !== 'true') {
+    list = list.filter(v => !v.hidden);
+  }
+  list.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
+  res.json(list);
+});
+
+app.post('/api/videos', checkAuth, (req, res) => {
+  const db = readDb();
+  if (!db.videos) db.videos = [];
+  const newVideo: VideoItem = {
+    id: `vid-${Date.now()}`,
+    title: req.body.title || 'Handmade Craft Video',
+    description: req.body.description || '',
+    videoUrl: req.body.videoUrl || '',
+    videoType: req.body.videoType || (req.body.videoUrl ? 'upload' : 'link'),
+    googleDriveUrl: req.body.googleDriveUrl || '',
+    embedUrl: req.body.embedUrl || '',
+    thumbnailUrl: req.body.thumbnailUrl || '',
+    category: req.body.category || 'Production Video',
+    featured: !!req.body.featured,
+    hidden: !!req.body.hidden,
+    orderIndex: req.body.orderIndex !== undefined ? Number(req.body.orderIndex) : db.videos.length + 1,
+    createdAt: new Date().toISOString()
+  };
+  db.videos.push(newVideo);
+  writeDb(db);
+  res.status(201).json(newVideo);
+});
+
+app.put('/api/videos/:id', checkAuth, (req, res) => {
+  const db = readDb();
+  if (!db.videos) db.videos = [];
+  const index = db.videos.findIndex(v => v.id === req.params.id);
+  if (index === -1) return res.status(404).json({ error: 'Video not found' });
+  db.videos[index] = { ...db.videos[index], ...req.body };
+  writeDb(db);
+  res.json(db.videos[index]);
+});
+
+app.delete('/api/videos/:id', checkAuth, (req, res) => {
+  const db = readDb();
+  if (!db.videos) db.videos = [];
+  db.videos = db.videos.filter(v => v.id !== req.params.id);
+  writeDb(db);
+  res.json({ success: true });
+});
+
+// Banners
+app.get('/api/banners', (req, res) => {
+  const db = readDb();
+  const list = db.banners || [];
+  res.json(list);
+});
+
+app.post('/api/banners', checkAuth, (req, res) => {
+  const db = readDb();
+  if (!db.banners) db.banners = [];
+  const newBanner: BannerItem = {
+    id: `banner-${Date.now()}`,
+    title: req.body.title || '',
+    subtitle: req.body.subtitle || '',
+    image: req.body.image || '',
+    ctaText: req.body.ctaText || '',
+    ctaLink: req.body.ctaLink || '',
+    countdownEnabled: !!req.body.countdownEnabled,
+    countdownDeadline: req.body.countdownDeadline || '',
+    active: req.body.active !== false,
+    orderIndex: req.body.orderIndex !== undefined ? Number(req.body.orderIndex) : db.banners.length + 1
+  };
+  db.banners.push(newBanner);
+  writeDb(db);
+  res.status(201).json(newBanner);
+});
+
+app.put('/api/banners/:id', checkAuth, (req, res) => {
+  const db = readDb();
+  if (!db.banners) db.banners = [];
+  const index = db.banners.findIndex(b => b.id === req.params.id);
+  if (index === -1) return res.status(404).json({ error: 'Banner not found' });
+  db.banners[index] = { ...db.banners[index], ...req.body };
+  writeDb(db);
+  res.json(db.banners[index]);
+});
+
+app.delete('/api/banners/:id', checkAuth, (req, res) => {
+  const db = readDb();
+  if (!db.banners) db.banners = [];
+  db.banners = db.banners.filter(b => b.id !== req.params.id);
+  writeDb(db);
+  res.json({ success: true });
+});
+
+// Custom Sections
+app.get('/api/custom-sections', (req, res) => {
+  const db = readDb();
+  const list = (db.customSections || []).filter(s => s.active);
+  list.sort((a, b) => (a.orderIndex || 0) - (b.orderIndex || 0));
+  res.json(list);
+});
+
+app.post('/api/custom-sections', checkAuth, (req, res) => {
+  const db = readDb();
+  if (!db.customSections) db.customSections = [];
+  const newSection: CustomSection = {
+    id: `section-${Date.now()}`,
+    title: req.body.title || 'New Section',
+    subtitle: req.body.subtitle || '',
+    content: req.body.content || '',
+    imageUrl: req.body.imageUrl || '',
+    buttonText: req.body.buttonText || '',
+    buttonLink: req.body.buttonLink || '',
+    backgroundColor: req.body.backgroundColor || '#F8FAFC',
+    textColor: req.body.textColor || '#0F172A',
+    orderIndex: req.body.orderIndex !== undefined ? Number(req.body.orderIndex) : db.customSections.length + 1,
+    active: req.body.active !== false,
+    hidden: req.body.hidden !== undefined ? !!req.body.hidden : req.body.active === false
+  };
+  db.customSections.push(newSection);
+  writeDb(db);
+  res.status(201).json(newSection);
+});
+
+app.put('/api/custom-sections/:id', checkAuth, (req, res) => {
+  const db = readDb();
+  if (!db.customSections) db.customSections = [];
+  const index = db.customSections.findIndex(s => s.id === req.params.id);
+  if (index === -1) return res.status(404).json({ error: 'Custom section not found' });
+  db.customSections[index] = { ...db.customSections[index], ...req.body };
+  writeDb(db);
+  res.json(db.customSections[index]);
+});
+
+app.delete('/api/custom-sections/:id', checkAuth, (req, res) => {
+  const db = readDb();
+  if (!db.customSections) db.customSections = [];
+  db.customSections = db.customSections.filter(s => s.id !== req.params.id);
+  writeDb(db);
+  res.json({ success: true });
+});
+
+// Worker Applications (Women Artisan & Local Worker registration)
+app.get('/api/worker-applications', checkAuth, (req, res) => {
+  const db = readDb();
+  res.json(db.workerApplications || []);
+});
+
+app.post('/api/worker-applications', (req, res) => {
+  const db = readDb();
+  if (!db.workerApplications) db.workerApplications = [];
+  const newApp: WorkerApplication = {
+    id: `worker-${Date.now()}`,
+    name: req.body.name || '',
+    phone: req.body.phone || '',
+    whatsappNumber: req.body.whatsappNumber || '',
+    email: req.body.email || '',
+    location: req.body.location || '',
+    craftSkill: req.body.craftSkill || 'Clay & Terracotta',
+    experienceYears: Number(req.body.experienceYears) || 0,
+    dailyCapacityHours: req.body.dailyCapacityHours || '4-6 hours',
+    hasSmartphone: req.body.hasSmartphone !== false,
+    notes: req.body.notes || '',
+    status: 'NEW',
+    createdAt: new Date().toISOString()
+  };
+  db.workerApplications.unshift(newApp);
+  writeDb(db);
+  res.status(201).json({ success: true, application: newApp });
+});
+
+app.put('/api/worker-applications/:id', checkAuth, (req, res) => {
+  const db = readDb();
+  if (!db.workerApplications) db.workerApplications = [];
+  const index = db.workerApplications.findIndex(w => w.id === req.params.id);
+  if (index === -1) return res.status(404).json({ error: 'Worker application not found' });
+  db.workerApplications[index] = { ...db.workerApplications[index], ...req.body };
+  writeDb(db);
+  res.json(db.workerApplications[index]);
 });
 
 // AI Chatbot

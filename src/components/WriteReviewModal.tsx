@@ -31,15 +31,15 @@ export const WriteReviewModal: React.FC<WriteReviewModalProps> = ({
   const getRatingLabel = (stars: number) => {
     switch (stars) {
       case 5:
-        return currentLanguage === 'bn' ? 'অসাধারণ (৫/৫)' : 'Outstanding (5/5)';
+        return currentLanguage === 'bn' ? 'অসাধারণ (৫/৫)' : currentLanguage === 'hi' ? 'उत्कृष्ट (५/५)' : 'Outstanding (5/5)';
       case 4:
-        return currentLanguage === 'bn' ? 'খুব ভালো (৪/৫)' : 'Very Good (4/5)';
+        return currentLanguage === 'bn' ? 'খুব ভালো (৪/৫)' : currentLanguage === 'hi' ? 'बहुत अच्छा (४/५)' : 'Very Good (4/5)';
       case 3:
-        return currentLanguage === 'bn' ? 'ভালো (৩/৫)' : 'Good (3/5)';
+        return currentLanguage === 'bn' ? 'ভালো (৩/৫)' : currentLanguage === 'hi' ? 'अच्छा (३/५)' : 'Good (3/5)';
       case 2:
-        return currentLanguage === 'bn' ? 'মোটামুটি (২/৫)' : 'Fair (2/5)';
+        return currentLanguage === 'bn' ? 'মোটামুটি (২/৫)' : currentLanguage === 'hi' ? 'औसत (२/५)' : 'Fair (2/5)';
       case 1:
-        return currentLanguage === 'bn' ? 'উন্নতি প্রয়োজন (১/৫)' : 'Needs Improvement (1/5)';
+        return currentLanguage === 'bn' ? 'উন্নতি প্রয়োজন (১/৫)' : currentLanguage === 'hi' ? 'सुधार की आवश्यकता (१/५)' : 'Needs Improvement (1/5)';
       default:
         return '';
     }
@@ -53,6 +53,8 @@ export const WriteReviewModal: React.FC<WriteReviewModalProps> = ({
       setError(
         currentLanguage === 'bn'
           ? 'অনুগ্রহ করে আপনার নাম লিখুন।'
+          : currentLanguage === 'hi'
+          ? 'कृपया अपना नाम लिखें।'
           : 'Please enter your name.'
       );
       return;
@@ -62,6 +64,8 @@ export const WriteReviewModal: React.FC<WriteReviewModalProps> = ({
       setError(
         currentLanguage === 'bn'
           ? 'অনুগ্রহ করে আপনার মতামত বা রিভিউ লিখুন।'
+          : currentLanguage === 'hi'
+          ? 'कृपया अपनी प्रतिक्रिया या समीक्षा लिखें।'
           : 'Please write your feedback or review.'
       );
       return;
@@ -109,11 +113,17 @@ export const WriteReviewModal: React.FC<WriteReviewModalProps> = ({
             </div>
             <div>
               <h3 className="text-base sm:text-lg font-extrabold font-serif-heading text-white">
-                {currentLanguage === 'bn' ? 'গ্রাহক রিভিউ বা মতামত লিখুন' : 'Write a Client Review'}
+                {currentLanguage === 'bn' 
+                  ? 'গ্রাহক রিভিউ বা মতামত লিখুন' 
+                  : currentLanguage === 'hi'
+                  ? 'ग्राहक समीक्षा या प्रतिक्रिया लिखें'
+                  : 'Write a Client Review'}
               </h3>
               <p className="text-xs text-amber-300">
                 {currentLanguage === 'bn'
                   ? 'আপনার মূল্যবান মতামত সরাসরি ওয়েবসাইটে প্রকাশিত হবে'
+                  : currentLanguage === 'hi'
+                  ? 'आपकी प्रतिक्रिया सीधे वेबसाइट पर प्रकाशित होगी'
                   : 'Your feedback will be published on our website'}
               </p>
             </div>
@@ -121,7 +131,7 @@ export const WriteReviewModal: React.FC<WriteReviewModalProps> = ({
           <button
             type="button"
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors"
+            className="p-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
             aria-label="Close"
           >
             <X className="w-5 h-5" />
@@ -135,12 +145,18 @@ export const WriteReviewModal: React.FC<WriteReviewModalProps> = ({
               <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto animate-bounce">
                 <CheckCircle2 className="w-10 h-10" />
               </div>
-              <h4 className="text-lg font-bold text-slate-900">
-                {currentLanguage === 'bn' ? 'ধন্যবাদ! আপনার রিভিউ যুক্ত হয়েছে।' : 'Thank You! Your Review is Published.'}
+              <h4 className="text-lg font-bold text-slate-900 font-serif-heading">
+                {currentLanguage === 'bn' 
+                  ? 'ধন্যবাদ! আপনার রিভিউ যুক্ত হয়েছে।' 
+                  : currentLanguage === 'hi'
+                  ? 'धन्यवाद! आपकी समीक्षा प्रकाशित हो गई है।'
+                  : 'Thank You! Your Review is Published.'}
               </h4>
               <p className="text-xs sm:text-sm text-slate-600 max-w-sm mx-auto">
                 {currentLanguage === 'bn'
                   ? 'আপনার মূল্যবান মতামতের জন্য আমরা কৃতজ্ঞ। এটি আমাদের শিল্প ও সেবার মান বাড়াতে সাহায্য করবে।'
+                  : currentLanguage === 'hi'
+                  ? 'आपकी मूल्यवान प्रतिक्रिया के लिए हम आभारी हैं।'
                   : 'We truly appreciate your feedback and support for our authentic Bengal artisans.'}
               </p>
             </div>
@@ -156,7 +172,11 @@ export const WriteReviewModal: React.FC<WriteReviewModalProps> = ({
               {/* Star Rating Picker */}
               <div className="space-y-1.5 text-center py-2 bg-slate-50 rounded-xl border border-slate-100">
                 <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider">
-                  {currentLanguage === 'bn' ? 'আপনার রেটিং সিলেক্ট করুন' : 'Your Rating'}
+                  {currentLanguage === 'bn' 
+                    ? 'আপনার রেটিং সিলেক্ট করুন' 
+                    : currentLanguage === 'hi'
+                    ? 'अपनी रेटिंग चुनें'
+                    : 'Your Rating'}
                 </label>
                 <div className="flex items-center justify-center gap-2">
                   {[1, 2, 3, 4, 5].map(star => {
@@ -188,14 +208,14 @@ export const WriteReviewModal: React.FC<WriteReviewModalProps> = ({
               {/* Client Name */}
               <div>
                 <label className="block text-xs font-bold text-slate-700 mb-1">
-                  {currentLanguage === 'bn' ? 'আপনার নাম *' : 'Your Name *'}
+                  {currentLanguage === 'bn' ? 'আপনার নাম *' : currentLanguage === 'hi' ? 'आपका नाम *' : 'Your Name *'}
                 </label>
                 <input
                   type="text"
                   required
-                  value={clientName}
+                  value={clientName || ''}
                   onChange={e => setClientName(e.target.value)}
-                  placeholder={currentLanguage === 'bn' ? 'যেমন: শ্রী অনন্যা দাস / রাহুল ব্যানার্জি' : 'e.g., Ananya Das / Amit Roy'}
+                  placeholder={currentLanguage === 'bn' ? 'যেমন: অনন্যা দাস / রাহুল ব্যানার্জি' : currentLanguage === 'hi' ? 'जैसे: अनन्या दास / राहुल' : 'e.g., Ananya Das / Amit Roy'}
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm text-slate-800 focus:outline-hidden focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
                 />
               </div>
@@ -204,25 +224,33 @@ export const WriteReviewModal: React.FC<WriteReviewModalProps> = ({
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
-                    {currentLanguage === 'bn' ? 'প্রতিষ্ঠান বা পরিচয় (ঐচ্ছিক)' : 'Company / Role (Optional)'}
+                    {currentLanguage === 'bn' 
+                      ? 'প্রতিষ্ঠান বা পরিচয় (ঐচ্ছিক)' 
+                      : currentLanguage === 'hi'
+                      ? 'संस्थान या भूमिका (वैकल्पिक)'
+                      : 'Company / Role (Optional)'}
                   </label>
                   <input
                     type="text"
-                    value={company}
+                    value={company || ''}
                     onChange={e => setCompany(e.target.value)}
-                    placeholder={currentLanguage === 'bn' ? 'যেমন: বুটিক ওনার / ব্যক্তিগত ক্রেতা' : 'e.g., Boutique Owner / Buyer'}
+                    placeholder={currentLanguage === 'bn' ? 'যেমন: বুটিক ওনার / ক্রেতা' : currentLanguage === 'hi' ? 'जैसे: बुटीक मालिक / ग्राहक' : 'e.g., Boutique Owner / Buyer'}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm text-slate-800 focus:outline-hidden focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
                   />
                 </div>
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
-                    {currentLanguage === 'bn' ? 'শহর বা স্থান (ঐচ্ছিক)' : 'Location / City (Optional)'}
+                    {currentLanguage === 'bn' 
+                      ? 'শহর বা স্থান (ঐচ্ছিক)' 
+                      : currentLanguage === 'hi'
+                      ? 'शहर या स्थान (वैकल्पिक)'
+                      : 'Location / City (Optional)'}
                   </label>
                   <input
                     type="text"
-                    value={location}
+                    value={location || ''}
                     onChange={e => setLocation(e.target.value)}
-                    placeholder={currentLanguage === 'bn' ? 'যেমন: কলকাতা / ঢাকা / লন্ডন' : 'e.g., Kolkata / Delhi / USA'}
+                    placeholder={currentLanguage === 'bn' ? 'যেমন: কলকাতা / ঢাকা / লন্ডন' : currentLanguage === 'hi' ? 'जैसे: कोलकाता / दिल्ली / मुंबई' : 'e.g., Kolkata / Delhi / USA'}
                     className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm text-slate-800 focus:outline-hidden focus:border-amber-500 focus:ring-2 focus:ring-amber-200"
                   />
                 </div>
@@ -233,16 +261,20 @@ export const WriteReviewModal: React.FC<WriteReviewModalProps> = ({
                 <label className="block text-xs font-bold text-slate-700 mb-1">
                   {currentLanguage === 'bn'
                     ? 'আপনার রিভিউ বা অভিজ্ঞতা লিখুন *'
+                    : currentLanguage === 'hi'
+                    ? 'अपनी समीक्षा या अनुभव लिखें *'
                     : 'Your Feedback / Review *'}
                 </label>
                 <textarea
                   required
                   rows={4}
-                  value={content}
+                  value={content || ''}
                   onChange={e => setContent(e.target.value)}
                   placeholder={
                     currentLanguage === 'bn'
                       ? 'হস্তশিল্প, টেরাকোটা গয়না, পণ্যের ফিনিশিং বা সেবার অভিজ্ঞতা সম্পর্কে লিখুন...'
+                      : currentLanguage === 'hi'
+                      ? 'हस्तशिल्प, टेराकोटा आभूषण, उत्पाद फिनिशिंग या सेवा अनुभव के बारे में लिखें...'
                       : 'Share your experience regarding product quality, terracotta jewellery, dispatch, or artisan craftsmanship...'
                   }
                   className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 text-xs sm:text-sm text-slate-800 focus:outline-hidden focus:border-amber-500 focus:ring-2 focus:ring-amber-200 resize-none"
@@ -254,9 +286,9 @@ export const WriteReviewModal: React.FC<WriteReviewModalProps> = ({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-900 rounded-xl hover:bg-slate-100 transition-colors"
+                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-900 rounded-xl hover:bg-slate-100 transition-colors cursor-pointer"
                 >
-                  {currentLanguage === 'bn' ? 'বাতিল' : 'Cancel'}
+                  {currentLanguage === 'bn' ? 'বাতিল' : currentLanguage === 'hi' ? 'रद्द करें' : 'Cancel'}
                 </button>
                 <button
                   type="submit"
@@ -269,7 +301,7 @@ export const WriteReviewModal: React.FC<WriteReviewModalProps> = ({
                     <Sparkles className="w-4 h-4" />
                   )}
                   <span>
-                    {currentLanguage === 'bn' ? 'রিভিউ জমা দিন' : 'Submit Review'}
+                    {currentLanguage === 'bn' ? 'রিভিউ জমা দিন' : currentLanguage === 'hi' ? 'समीक्षा भेजें' : 'Submit Review'}
                   </span>
                 </button>
               </div>

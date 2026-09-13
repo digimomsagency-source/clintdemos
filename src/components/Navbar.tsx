@@ -8,9 +8,10 @@ import {
   Lock, 
   ChevronDown, 
   ChevronRight, 
-  GraduationCap,
+  HeartHandshake,
   Package,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Clock
 } from 'lucide-react';
 import { useApp } from '../context/AppContext';
 
@@ -20,31 +21,46 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ currentRoute, onNavigate }) => {
-  const { settings, currentLanguage, setLanguage, openBulkModal, isAdmin } = useApp();
+  const { settings, navigation, currentLanguage, setLanguage, dict, openBulkModal, isAdmin } = useApp();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [moreDropdownOpen, setMoreDropdownOpen] = useState(false);
+  const [phoneDropdownOpen, setPhoneDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const phoneRef = useRef<HTMLDivElement>(null);
 
-  const phone = settings?.phone || '+91 82405 85219';
+  const primaryPhone = settings?.phone || '+91 82405 85219';
+  const secondaryPhone = settings?.secondaryPhone || '+91 80738 36537';
+  const tertiaryPhone = settings?.tertiaryPhone || '+91 89068 01895';
   const companyName = settings?.companyName || 'JIT PRIME MPC COMPANY';
   const ownerName = settings?.ownerName || 'MONOJIT DEY';
 
-  // Primary visible links (keeps header clean, compact, and never overflows)
+  const tagline = currentLanguage === 'bn' 
+    ? 'আপনার বিশ্বাস আমাদের অগ্রাধিকার' 
+    : currentLanguage === 'hi' 
+      ? 'आपका विश्वास हमारी प्राथमिकता' 
+      : (settings?.visitingCardTagline || 'Your Trust Our Priority');
+
+  // Primary visible links
   const primaryLinks = [
-    { label: currentLanguage === 'bn' ? 'হোম' : 'Home', route: '/' },
-    { label: currentLanguage === 'bn' ? 'প্রোডাক্টস' : 'Products', route: '/products' },
-    { label: currentLanguage === 'bn' ? 'গ্যালারি' : 'Craft Gallery', route: '/gallery', isNew: true },
-    { label: currentLanguage === 'bn' ? 'Learn & Earn' : 'Learn & Earn', route: '/training-livelihood', highlight: true },
-    { label: currentLanguage === 'bn' ? 'বাল্ক অর্ডার' : 'Bulk Orders', route: '/bulk-orders' },
+    { label: dict.nav_home, route: '/' },
+    { label: dict.nav_products, route: '/products' },
+    { label: dict.nav_gallery, route: '/gallery', isNew: true },
+    { label: dict.nav_women_work, route: '/training-livelihood', highlight: true },
+    { label: dict.nav_bulk, route: '/bulk-orders' },
   ];
+
+  // Check if Our Artisans is enabled from admin
+  const isArtisansMenuEnabled = settings?.showArtisansMenu !== false && !(navigation || []).find(n => n.route === '/our-artisans' || n.route === '/artisans')?.hidden;
 
   // Secondary links grouped neatly in dropdown
   const secondaryLinks = [
-    { label: currentLanguage === 'bn' ? 'আমাদের সম্পর্কে' : 'About Us', route: '/about' },
-    { label: currentLanguage === 'bn' ? 'আমাদের কারিগরবৃন্দ' : 'Our Artisans', route: '/our-artisans' },
-    { label: currentLanguage === 'bn' ? 'সরকারি টেন্ডার ও প্রতিষ্ঠান' : 'Govt & Institutional', route: '/government-institutional' },
-    { label: currentLanguage === 'bn' ? 'আন্তর্জাতিক ক্রেতা' : 'International Buyers', route: '/international-buyers' },
-    { label: currentLanguage === 'bn' ? 'যোগাযোগ' : 'Contact Us', route: '/contact' },
+    { label: dict.nav_govt, route: '/government-institutional' },
+    { label: dict.nav_international, route: '/international-buyers' },
+    { label: dict.nav_about, route: '/about' },
+    ...(isArtisansMenuEnabled ? [
+      { label: currentLanguage === 'bn' ? 'আমাদের কারিগরবৃন্দ' : currentLanguage === 'hi' ? 'हमारे कारीगर' : 'Our Artisans', route: '/our-artisans' }
+    ] : []),
+    { label: dict.nav_contact, route: '/contact' },
   ];
 
   const handleNav = (route: string) => {
@@ -54,11 +70,14 @@ export const Navbar: React.FC<NavbarProps> = ({ currentRoute, onNavigate }) => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Close dropdown on outside click
+  // Close dropdowns on outside click
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
         setMoreDropdownOpen(false);
+      }
+      if (phoneRef.current && !phoneRef.current.contains(e.target as Node)) {
+        setPhoneDropdownOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -69,51 +88,110 @@ export const Navbar: React.FC<NavbarProps> = ({ currentRoute, onNavigate }) => {
 
   return (
     <header className="w-full sticky top-0 z-40 bg-white border-b border-slate-200 shadow-xs">
-      {/* 1. Ultra-compact Top Notification Bar (Height: ~26px, No clutter) */}
-      <div className="bg-slate-900 text-slate-300 text-[11px] py-1 px-4 border-b border-slate-800">
+      {/* 1. Ultra-compact Top Bar with 3 Contacts and Language Selector */}
+      <div className="bg-slate-950 text-slate-300 text-[11px] py-1 px-4 border-b border-slate-800">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
-          <div className="flex items-center gap-3 overflow-hidden text-ellipsis whitespace-nowrap">
+          <div className="flex items-center gap-2 sm:gap-3 overflow-hidden text-ellipsis whitespace-nowrap">
             <span className="inline-flex items-center gap-1 font-medium text-amber-400">
               <ShieldCheck className="w-3 h-3 text-amber-400 shrink-0" />
-              <span>Govt. Tender &bull; Hasta Shilpa</span>
+              <span>Hasta Shilpa &bull; Govt Tender</span>
             </span>
-            <span className="text-slate-600 hidden sm:inline">&bull;</span>
+            <span className="text-slate-700 hidden md:inline">|</span>
+
+            {/* Primary Phone */}
             <a 
-              href={`tel:${phone.replace(/\s+/g, '')}`} 
-              className="inline-flex items-center gap-1 hover:text-white transition-colors text-slate-300"
+              href={`tel:${primaryPhone.replace(/\s+/g, '')}`} 
+              className="inline-flex items-center gap-1 hover:text-white transition-colors text-slate-200 font-medium"
+              title="Primary Contact"
             >
               <Phone className="w-3 h-3 text-amber-400 shrink-0" />
-              <span>{phone}</span>
+              <span>{primaryPhone}</span>
             </a>
+
+            {/* Additional Contact Numbers Dropdown */}
+            <div className="relative hidden sm:inline-block" ref={phoneRef}>
+              <button
+                type="button"
+                onClick={() => setPhoneDropdownOpen(!phoneDropdownOpen)}
+                className="text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 px-1.5 py-0.5 rounded flex items-center gap-1 cursor-pointer transition-colors"
+              >
+                <span>+2 Lines</span>
+                <ChevronDown className="w-2.5 h-2.5" />
+              </button>
+
+              {phoneDropdownOpen && (
+                <div className="absolute left-0 mt-1 w-56 bg-slate-900 border border-slate-700 rounded-lg p-2 shadow-xl z-50 text-xs">
+                  <div className="text-[10px] text-slate-400 uppercase tracking-wider mb-1.5 px-1 font-semibold">
+                    {dict.all_contacts_label}
+                  </div>
+                  <a
+                    href={`tel:${primaryPhone.replace(/\s+/g, '')}`}
+                    className="flex items-center justify-between p-1.5 rounded hover:bg-slate-800 text-slate-200 font-semibold"
+                  >
+                    <span>{primaryPhone}</span>
+                    <span className="text-[9px] bg-amber-500/20 text-amber-400 px-1 py-0.5 rounded">Primary</span>
+                  </a>
+                  <a
+                    href={`tel:${secondaryPhone.replace(/\s+/g, '')}`}
+                    className="flex items-center justify-between p-1.5 rounded hover:bg-slate-800 text-slate-300"
+                  >
+                    <span>{secondaryPhone}</span>
+                    <span className="text-[9px] bg-slate-800 text-slate-400 px-1 py-0.5 rounded">Secondary</span>
+                  </a>
+                  <a
+                    href={`tel:${tertiaryPhone.replace(/\s+/g, '')}`}
+                    className="flex items-center justify-between p-1.5 rounded hover:bg-slate-800 text-slate-300"
+                  >
+                    <span>{tertiaryPhone}</span>
+                    <span className="text-[9px] bg-slate-800 text-slate-400 px-1 py-0.5 rounded">Tertiary</span>
+                  </a>
+                </div>
+              )}
+            </div>
           </div>
 
           <div className="flex items-center gap-3 shrink-0">
-            {/* Language Selector */}
-            <div className="flex items-center bg-slate-800 rounded px-1 py-0.5 text-[10px] gap-1">
+            {/* Business Hours Badge */}
+            <div className="hidden md:flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 font-semibold text-[10px]">
+              <Clock className="w-3 h-3 text-emerald-400 shrink-0" />
+              <span>{settings?.businessHours || '24/7 (Always Open)'}</span>
+            </div>
+
+            {/* Language Selector: English / বাংলা / हिन्दी */}
+            <div className="flex items-center bg-slate-900 border border-slate-700 rounded-md p-0.5 text-xs font-medium">
               <button
                 type="button"
                 onClick={() => setLanguage('en')}
-                className={`px-1.5 py-0.5 rounded transition-all ${
-                  currentLanguage === 'en' ? 'bg-amber-500 text-slate-950 font-bold' : 'text-slate-400 hover:text-white'
+                className={`px-2 py-0.5 rounded transition-all cursor-pointer ${
+                  currentLanguage === 'en' 
+                    ? 'bg-amber-500 text-slate-950 font-bold shadow-xs' 
+                    : 'text-slate-300 hover:text-white'
                 }`}
+                title="Switch to English"
               >
-                EN
+                English
               </button>
               <button
                 type="button"
                 onClick={() => setLanguage('bn')}
-                className={`px-1.5 py-0.5 rounded transition-all ${
-                  currentLanguage === 'bn' ? 'bg-amber-500 text-slate-950 font-bold' : 'text-slate-400 hover:text-white'
+                className={`px-2 py-0.5 rounded transition-all cursor-pointer ${
+                  currentLanguage === 'bn' 
+                    ? 'bg-amber-500 text-slate-950 font-bold shadow-xs' 
+                    : 'text-slate-300 hover:text-white'
                 }`}
+                title="বাংলা ভাষায় দেখুন"
               >
                 বাংলা
               </button>
               <button
                 type="button"
                 onClick={() => setLanguage('hi')}
-                className={`px-1.5 py-0.5 rounded transition-all ${
-                  currentLanguage === 'hi' ? 'bg-amber-500 text-slate-950 font-bold' : 'text-slate-400 hover:text-white'
+                className={`px-2 py-0.5 rounded transition-all cursor-pointer ${
+                  currentLanguage === 'hi' 
+                    ? 'bg-amber-500 text-slate-950 font-bold shadow-xs' 
+                    : 'text-slate-300 hover:text-white'
                 }`}
+                title="हिन्दी भाषा में देखें"
               >
                 हिन्दी
               </button>
@@ -130,36 +208,44 @@ export const Navbar: React.FC<NavbarProps> = ({ currentRoute, onNavigate }) => {
               }`}
             >
               <Lock className="w-2.5 h-2.5" />
-              <span>{isAdmin ? 'Admin Panel' : 'Admin'}</span>
+              <span>{isAdmin ? 'Admin' : dict.nav_admin}</span>
             </button>
           </div>
         </div>
       </div>
 
-      {/* 2. Main Navigation Bar (Clean, Compact Height ~56px, Fits any resolution without overflowing) */}
+      {/* 2. Main Navigation Bar */}
       <div className="max-w-7xl mx-auto px-4 py-2.5 flex items-center justify-between gap-4">
-        {/* Brand identity */}
+        {/* Brand identity / Logo */}
         <button 
           type="button"
           onClick={() => handleNav('/')}
-          className="text-left flex items-center gap-2.5 focus:outline-hidden group shrink-0"
+          className="text-left flex items-center gap-3 focus:outline-hidden group shrink-0 cursor-pointer"
         >
-          <div className="w-9 h-9 rounded-md bg-slate-900 border border-slate-700 flex items-center justify-center text-amber-400 shadow-xs shrink-0">
-            <Sparkles className="w-5 h-5" />
-          </div>
+          {settings?.logoUrl ? (
+            <img 
+              src={settings.logoUrl} 
+              alt={companyName} 
+              className="h-10 max-w-[160px] object-contain rounded"
+            />
+          ) : (
+            <div className="w-10 h-10 rounded-lg bg-[#0B1A30] border border-amber-500/40 flex items-center justify-center text-amber-400 shadow-xs shrink-0 group-hover:border-amber-400 transition-colors">
+              <Sparkles className="w-5 h-5 text-amber-400" />
+            </div>
+          )}
           <div>
-            <div className="font-bold text-sm sm:text-base tracking-tight text-slate-900 group-hover:text-amber-700 transition-colors">
+            <div className="font-extrabold text-sm sm:text-base tracking-tight text-slate-900 group-hover:text-amber-600 transition-colors uppercase font-serif-heading">
               {companyName}
             </div>
             <div className="text-[11px] text-slate-500 flex items-center gap-1 font-normal">
-              <span>{ownerName}</span>
+              <span className="font-semibold text-slate-700">{ownerName}</span>
               <span>&bull;</span>
-              <span className="hidden sm:inline">Kolkata Handicrafts</span>
+              <span className="text-amber-700 font-medium italic">{tagline}</span>
             </div>
           </div>
         </button>
 
-        {/* Desktop Menu: Strictly formatted to NEVER overflow */}
+        {/* Desktop Menu */}
         <nav className="hidden lg:flex items-center gap-1 text-sm font-medium">
           {primaryLinks.map((item) => {
             const isActive = currentRoute === item.route;
@@ -168,13 +254,13 @@ export const Navbar: React.FC<NavbarProps> = ({ currentRoute, onNavigate }) => {
                 key={item.route}
                 type="button"
                 onClick={() => handleNav(item.route)}
-                className={`px-2.5 py-1.5 rounded-md transition-colors whitespace-nowrap flex items-center gap-1 ${
+                className={`px-2.5 py-1.5 rounded-md transition-colors whitespace-nowrap flex items-center gap-1.5 ${
                   isActive
                     ? 'text-slate-950 font-semibold bg-slate-100'
                     : 'text-slate-700 hover:text-slate-950 hover:bg-slate-50'
                 } ${item.highlight ? 'text-amber-800 font-semibold' : ''}`}
               >
-                {item.highlight && <GraduationCap className="w-3.5 h-3.5 text-amber-600" />}
+                {item.highlight && <HeartHandshake className="w-3.5 h-3.5 text-amber-600" />}
                 {item.route === '/gallery' && <ImageIcon className="w-3.5 h-3.5 text-slate-600" />}
                 <span>{item.label}</span>
                 {item.isNew && (
@@ -197,12 +283,12 @@ export const Navbar: React.FC<NavbarProps> = ({ currentRoute, onNavigate }) => {
                   : 'text-slate-700 hover:text-slate-950 hover:bg-slate-50'
               }`}
             >
-              <span>{currentLanguage === 'bn' ? 'অন্যান্য' : 'More'}</span>
+              <span>{dict.nav_more}</span>
               <ChevronDown className={`w-3.5 h-3.5 transition-transform ${moreDropdownOpen ? 'rotate-180' : ''}`} />
             </button>
 
             {moreDropdownOpen && (
-              <div className="absolute right-0 mt-1 w-52 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
+              <div className="absolute right-0 mt-1 w-56 bg-white rounded-lg shadow-lg border border-slate-200 py-1 z-50 animate-in fade-in slide-in-from-top-1 duration-150">
                 {secondaryLinks.map((link) => {
                   const isActive = currentRoute === link.route;
                   return (
@@ -234,7 +320,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentRoute, onNavigate }) => {
             className="px-3.5 py-1.5 bg-slate-900 hover:bg-slate-800 text-white font-medium text-xs rounded-md shadow-xs hover:shadow-sm transition-all flex items-center gap-1.5 cursor-pointer"
           >
             <Package className="w-3.5 h-3.5 text-amber-400" />
-            <span>{currentLanguage === 'bn' ? 'বাল্ক কোটেশন' : 'Get Bulk Quote'}</span>
+            <span>{dict.nav_get_quote}</span>
           </button>
         </div>
 
@@ -246,7 +332,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentRoute, onNavigate }) => {
             className="px-2.5 py-1.5 bg-slate-900 text-white font-medium text-[11px] rounded-md flex items-center gap-1"
           >
             <Package className="w-3 h-3 text-amber-400" />
-            <span>Bulk Quote</span>
+            <span>{dict.nav_get_quote}</span>
           </button>
           <button
             type="button"
@@ -261,8 +347,44 @@ export const Navbar: React.FC<NavbarProps> = ({ currentRoute, onNavigate }) => {
 
       {/* 3. Mobile Drawer Menu */}
       {mobileMenuOpen && (
-        <div className="lg:hidden bg-white border-t border-slate-200 px-4 py-3 space-y-1 shadow-md max-h-[85vh] overflow-y-auto">
-          <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-2 py-1">
+        <div className="lg:hidden bg-white border-t border-slate-200 px-4 py-3 space-y-2 shadow-md max-h-[85vh] overflow-y-auto">
+          {/* Mobile Language Selector */}
+          <div className="pb-2 border-b border-slate-100">
+            <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider mb-1.5">
+              Language / ভাষা / भाषा
+            </div>
+            <div className="grid grid-cols-3 gap-1.5">
+              <button
+                type="button"
+                onClick={() => setLanguage('en')}
+                className={`py-1.5 text-xs rounded font-medium text-center ${
+                  currentLanguage === 'en' ? 'bg-amber-500 text-slate-950 font-bold' : 'bg-slate-100 text-slate-700'
+                }`}
+              >
+                English
+              </button>
+              <button
+                type="button"
+                onClick={() => setLanguage('bn')}
+                className={`py-1.5 text-xs rounded font-medium text-center ${
+                  currentLanguage === 'bn' ? 'bg-amber-500 text-slate-950 font-bold' : 'bg-slate-100 text-slate-700'
+                }`}
+              >
+                বাংলা
+              </button>
+              <button
+                type="button"
+                onClick={() => setLanguage('hi')}
+                className={`py-1.5 text-xs rounded font-medium text-center ${
+                  currentLanguage === 'hi' ? 'bg-amber-500 text-slate-950 font-bold' : 'bg-slate-100 text-slate-700'
+                }`}
+              >
+                हिन्दी
+              </button>
+            </div>
+          </div>
+
+          <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-1">
             Menu Navigation
           </div>
           
@@ -280,7 +402,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentRoute, onNavigate }) => {
                 }`}
               >
                 <div className="flex items-center gap-2">
-                  {item.highlight && <GraduationCap className="w-4 h-4 text-amber-600" />}
+                  {item.highlight && <HeartHandshake className="w-4 h-4 text-amber-600" />}
                   {item.route === '/gallery' && <ImageIcon className="w-4 h-4 text-slate-600" />}
                   <span>{item.label}</span>
                 </div>
@@ -294,7 +416,7 @@ export const Navbar: React.FC<NavbarProps> = ({ currentRoute, onNavigate }) => {
           })}
 
           <div className="border-t border-slate-100 my-1 pt-1">
-            <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-2 py-1">
+            <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-1 py-1">
               Company &amp; Institutional
             </div>
             {secondaryLinks.map((item) => {
@@ -324,11 +446,12 @@ export const Navbar: React.FC<NavbarProps> = ({ currentRoute, onNavigate }) => {
               className="w-full py-2 bg-slate-900 text-white font-medium text-sm rounded-md shadow-xs text-center flex items-center justify-center gap-2"
             >
               <Package className="w-4 h-4 text-amber-400" />
-              <span>Request Bulk Quote &amp; Order</span>
+              <span>{dict.nav_get_quote}</span>
             </button>
-            <div className="text-xs text-slate-500 px-2 pt-2 border-t border-slate-100">
-              <p className="font-semibold text-slate-800">Jit Prime MPC Company</p>
-              <p>Owner: Monojit Dey &bull; Phone: {phone}</p>
+            <div className="text-xs text-slate-500 px-2 pt-2 border-t border-slate-100 space-y-1">
+              <p className="font-semibold text-slate-800">{companyName}</p>
+              <p>Proprietor: {ownerName}</p>
+              <p className="text-slate-700 font-medium">📞 {primaryPhone} | {secondaryPhone}</p>
             </div>
           </div>
         </div>

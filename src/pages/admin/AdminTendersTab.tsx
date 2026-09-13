@@ -51,7 +51,16 @@ export const AdminTendersTab: React.FC = () => {
 
   const handleOpenEdit = (t: GovernmentTender) => {
     setEditingTender(t);
-    setFormData({ ...t });
+    setFormData({
+      ...t,
+      title: t.title || '',
+      issuingOrganization: t.issuingOrganization || '',
+      year: t.year || '',
+      category: t.category || '',
+      caseStudySnippet: t.caseStudySnippet || '',
+      status: t.status || 'Successfully Executed',
+      hidden: t.hidden || false
+    });
     setIsModalOpen(true);
   };
 
@@ -166,7 +175,7 @@ export const AdminTendersTab: React.FC = () => {
                 <input
                   type="text"
                   required
-                  value={formData.title}
+                  value={formData.title || ''}
                   onChange={e => setFormData({ ...formData, title: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
                 />
@@ -177,7 +186,7 @@ export const AdminTendersTab: React.FC = () => {
                   <label className="block font-bold text-slate-700 mb-1">Issuing Organization</label>
                   <input
                     type="text"
-                    value={formData.issuingOrganization}
+                    value={formData.issuingOrganization || ''}
                     onChange={e => setFormData({ ...formData, issuingOrganization: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
                   />
@@ -186,7 +195,7 @@ export const AdminTendersTab: React.FC = () => {
                   <label className="block font-bold text-slate-700 mb-1">Year / Timeline</label>
                   <input
                     type="text"
-                    value={formData.year}
+                    value={formData.year || ''}
                     onChange={e => setFormData({ ...formData, year: e.target.value })}
                     className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
                   />
@@ -197,7 +206,7 @@ export const AdminTendersTab: React.FC = () => {
                 <label className="block font-bold text-slate-700 mb-1">Procurement Category</label>
                 <input
                   type="text"
-                  value={formData.category}
+                  value={formData.category || ''}
                   onChange={e => setFormData({ ...formData, category: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
                 />
@@ -207,7 +216,7 @@ export const AdminTendersTab: React.FC = () => {
                 <label className="block font-bold text-slate-700 mb-1">Execution / Capability Summary</label>
                 <textarea
                   rows={3}
-                  value={formData.caseStudySnippet}
+                  value={formData.caseStudySnippet || ''}
                   onChange={e => setFormData({ ...formData, caseStudySnippet: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
                 />
@@ -217,7 +226,7 @@ export const AdminTendersTab: React.FC = () => {
                 <label className="block font-bold text-slate-700 mb-1">Status Badge</label>
                 <input
                   type="text"
-                  value={formData.status}
+                  value={formData.status || ''}
                   onChange={e => setFormData({ ...formData, status: e.target.value })}
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-300 rounded-xl"
                 />
