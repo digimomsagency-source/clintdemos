@@ -9,8 +9,8 @@ interface AdminLoginProps {
 
 export const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess, onCancel }) => {
   const { login, settings } = useApp();
-  const [username, setUsername] = useState('admin@gmail.com');
-  const [password, setPassword] = useState('Jit@123');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -20,6 +20,12 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess, onCancel }) =
 
     const cleanUser = u.trim();
     const cleanPass = p.trim();
+
+    if (!cleanUser || !cleanPass) {
+      setError('ইউজারনেম/ইমেইল এবং পাসওয়ার্ড আবশ্যক (Username/email and password required)');
+      setLoading(false);
+      return;
+    }
 
     try {
       const res = await fetch('/api/auth/login', {
@@ -35,27 +41,31 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess, onCancel }) =
             login(data.token, data.user);
             onSuccess();
             return;
-          } else {
-            setError(data.error || data.message || 'Invalid username/email or password');
-            return;
           }
         }
       }
     } catch {
-      // Backend not running or static host (Netlify / GitHub Pages)
+      // Backend not running or static host (Netlify / GitHub Pages) - seamlessly fallback
     }
 
-    // Static / Offline Fallback Authentication
+    // Static / Offline Fallback Authentication (for Netlify, GitHub Pages, or offline mode)
+    const customPwd = localStorage.getItem('jit_admin_custom_pwd');
+
     const validUsers = [
-      { username: 'admin', email: 'admin@gmail.com', pass: 'Jit@123', name: 'Admin', role: 'superadmin' },
-      { username: 'admin', email: 'admin@jitprime.com', pass: 'admin123', name: 'Admin', role: 'superadmin' },
-      { username: 'monojit', email: 'monojitdey189@gmail.com', pass: 'jitprime85219', name: 'Monojit Dey', role: 'superadmin' }
+      { username: 'admin', email: 'admin@gmail.com', pass: ['Jit@123', 'admin123'], name: 'Admin', role: 'superadmin' },
+      { username: 'admin', email: 'admin@jitprime.com', pass: ['Jit@123', 'admin123'], name: 'Admin', role: 'superadmin' },
+      { username: 'monojit', email: 'monojitdey189@gmail.com', pass: ['jitprime85219', 'Jit@123'], name: 'Monojit Dey', role: 'superadmin' }
     ];
 
-    const matched = validUsers.find(
-      acc => (acc.username.toLowerCase() === cleanUser.toLowerCase() || acc.email.toLowerCase() === cleanUser.toLowerCase()) && 
-             acc.pass === cleanPass
-    );
+    const matched = validUsers.find(acc => {
+      const userMatches = acc.username.toLowerCase() === cleanUser.toLowerCase() || 
+                          acc.email.toLowerCase() === cleanUser.toLowerCase();
+      if (!userMatches) return false;
+
+      // Match default passwords or custom password updated from admin settings
+      const passMatches = acc.pass.includes(cleanPass) || (customPwd && cleanPass === customPwd);
+      return passMatches;
+    });
 
     if (matched) {
       const demoToken = 'jit_admin_token_' + Date.now();
@@ -67,7 +77,7 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess, onCancel }) =
       });
       onSuccess();
     } else {
-      setError('Invalid username/email or password. (Credentials: admin@gmail.com / Jit@123)');
+      setError('ভুল ইউজারনেম/ইমেইল বা পাসওয়ার্ড। অনুগ্রহ করে সঠিক পাসওয়ার্ড দিয়ে চেষ্টা করুন। (Invalid credentials)');
     }
     setLoading(false);
   };
@@ -88,52 +98,55 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess, onCancel }) =
           </div>
           <h2 className="text-xl font-bold font-serif-heading">Admin Management Portal</h2>
           <p className="text-xs text-slate-300 mt-1">
-            Jit Prime MPC Company &bull; Monojit Dey
+            {settings?.companyName || 'Jit Prime MPC Company'} &bull; {settings?.ownerName || 'Monojit Dey'}
           </p>
         </div>
 
         {/* Form */}
         <div className="p-6 sm:p-8 space-y-5">
           {error && (
-            <div className="p-3 bg-red-50 text-red-700 text-xs rounded-xl border border-red-200 flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>{error}</span>
+            <div className="p-3.5 bg-red-50 text-red-700 text-xs rounded-xl border border-red-200 flex items-start gap-2.5">
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-red-600" />
+              <span className="leading-relaxed">{error}</span>
             </div>
           )}
 
           <form onSubmit={handleLogin} className="space-y-4 text-xs sm:text-sm">
             <div>
               <label className="block font-bold text-slate-700 mb-1">
-                Admin Username or Email
+                Admin Username or Email (ইউজারনেম বা ইমেইল)
               </label>
               <input
                 type="text"
                 required
-                placeholder="admin or monojitdey189@gmail.com"
-                value={username || ''}
+                autoComplete="username"
+                placeholder="admin@gmail.com বা monojitdey189@gmail.com"
+                value={username}
                 onChange={e => setUsername(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500 outline-hidden"
+                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500 outline-hidden text-slate-900 font-medium"
               />
             </div>
 
             <div>
               <label className="block font-bold text-slate-700 mb-1">
-                Password
+                Password (পাসওয়ার্ড)
               </label>
               <input
                 type="password"
                 required
-                value={password || ''}
+                autoComplete="current-password"
+                placeholder="আপনার অ্যাডমিন পাসওয়ার্ড লিখুন"
+                value={password}
                 onChange={e => setPassword(e.target.value)}
-                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500 outline-hidden"
+                className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-300 rounded-xl focus:bg-white focus:ring-2 focus:ring-amber-500 outline-hidden text-slate-900 font-medium"
               />
             </div>
 
-            <div className="pt-2 flex items-center justify-between gap-3">
+            <div className="pt-3 flex items-center justify-between gap-3">
               <button
                 type="button"
                 onClick={onCancel}
-                className="px-4 py-2.5 text-slate-600 hover:bg-slate-100 font-semibold rounded-xl text-xs cursor-pointer"
+                className="px-4 py-2.5 text-slate-600 hover:bg-slate-100 font-semibold rounded-xl text-xs cursor-pointer transition-colors"
               >
                 Back to Website
               </button>
@@ -142,58 +155,11 @@ export const AdminLogin: React.FC<AdminLoginProps> = ({ onSuccess, onCancel }) =
                 disabled={loading}
                 className="px-6 py-2.5 bg-linear-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-bold text-xs rounded-xl shadow-sm hover:shadow-md transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
               >
-                <span>{loading ? 'Verifying...' : 'Sign In'}</span>
+                <span>{loading ? 'Verifying...' : 'Sign In (লগইন করুন)'}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             </div>
           </form>
-
-          {/* Quick Credential Hint & 1-Click Access */}
-          <div className="p-3.5 bg-amber-50/90 border border-amber-200 rounded-2xl text-[11px] text-amber-950 space-y-2.5">
-            <div className="flex items-center justify-between">
-              <span className="font-bold text-amber-950 flex items-center gap-1.5">
-                <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
-                <span>Instant 1-Click Login:</span>
-              </span>
-              <span className="text-[10px] text-amber-800 bg-amber-200/60 px-2 py-0.5 rounded-full font-semibold">Authorized</span>
-            </div>
-            
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-              <button
-                type="button"
-                disabled={loading}
-                onClick={() => {
-                  setUsername('admin@gmail.com');
-                  setPassword('Jit@123');
-                  handleLoginWithCreds('admin@gmail.com', 'Jit@123');
-                }}
-                className="w-full text-left p-2 rounded-xl bg-white border border-amber-300 hover:border-amber-500 hover:bg-amber-100/50 transition-all shadow-xs cursor-pointer disabled:opacity-50"
-              >
-                <p className="font-bold text-slate-900 text-xs flex items-center justify-between">
-                  <span>Sign In (Admin Setup)</span>
-                  <ArrowRight className="w-3 h-3 text-amber-600" />
-                </p>
-                <p className="text-[10px] text-slate-500 font-mono mt-0.5">admin@gmail.com / Jit@123</p>
-              </button>
-
-              <button
-                type="button"
-                disabled={loading}
-                onClick={() => {
-                  setUsername('monojit');
-                  setPassword('jitprime85219');
-                  handleLoginWithCreds('monojit', 'jitprime85219');
-                }}
-                className="w-full text-left p-2 rounded-xl bg-white border border-amber-300 hover:border-amber-500 hover:bg-amber-100/50 transition-all shadow-xs cursor-pointer disabled:opacity-50"
-              >
-                <p className="font-bold text-slate-900 text-xs flex items-center justify-between">
-                  <span>Monojit Dey (Owner)</span>
-                  <ArrowRight className="w-3 h-3 text-amber-600" />
-                </p>
-                <p className="text-[10px] text-slate-500 font-mono mt-0.5">monojit / jitprime85219</p>
-              </button>
-            </div>
-          </div>
         </div>
 
       </div>

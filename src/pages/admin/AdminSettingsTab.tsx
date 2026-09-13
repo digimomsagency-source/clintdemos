@@ -156,6 +156,7 @@ export const AdminSettingsTab: React.FC = () => {
 
     setChangingPassword(true);
     try {
+      localStorage.setItem('jit_admin_custom_pwd', newPassword);
       await api.changePassword(newPassword);
       setPasswordSuccess(true);
       setNewPassword('');
